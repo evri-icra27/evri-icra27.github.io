@@ -1,5 +1,5 @@
 site:
-  name: EVRI
+  name: EVRI · ICRA 2027
   site: 'https://evri-icra27.github.io'
   base: '/'
   trailingSlash: false
@@ -8,23 +8,18 @@ site:
 # Default SEO metadata
 metadata:
   title:
-    default: AstroWind
-    template: '%s — AstroWind'
-  description: "\U0001F680 Suitable for Startups, Small Business, Sass Websites, Professional Portfolios, Marketing Websites, Landing Pages & Blogs."
+    default: Event-Based Vision for Real-World Robotics
+    template: '%s — EVRI · ICRA 2027'
+  description: 'Event-Based Vision for Real-World Robotics: From Perception to Embodied Intelligence. A proposed full-day workshop at ICRA 2027, bringing together event-based perception and embodied AI.'
   robots:
     index: true
     follow: true
   openGraph:
-    site_name: AstroWind
-    images:
-      - url: '~/assets/images/default.png'
-        width: 1200
-        height: 628
+    site_name: EVRI · ICRA 2027
+    images: []
     type: website
   twitter:
-    handle: '@arthelokyo'
-    site: '@arthelokyo'
-    cardType: summary_large_image
+    cardType: summary
 
 i18n:
   language: en
@@ -32,7 +27,7 @@ i18n:
 
 apps:
   blog:
-    isEnabled: true
+    isEnabled: false
     postsPerPage: 8
 
     post:

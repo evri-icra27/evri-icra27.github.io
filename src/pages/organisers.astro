@@ -1,0 +1,31 @@
+---
+import Layout from '~/layouts/PageLayout.astro';
+import PageIntro from '~/components/workshop/PageIntro.astro';
+import Organisers from '~/components/workshop/Organisers.astro';
+import { workshop } from '~/data/workshop';
+---
+
+<Layout
+  metadata={{
+    title: 'Organisers',
+    description: 'Meet the organising team behind the proposed EVRI workshop at ICRA 2027.',
+  }}
+>
+  <PageIntro
+    title="Organisers"
+    description="Bringing together expertise in event-based perception, neuromorphic systems, and embodied intelligence across the robotics community."
+  />
+  <section class="mx-auto max-w-6xl px-4 pb-16 sm:px-6 md:pb-24" aria-label="Workshop organising team">
+    <Organisers />
+    <div class="mt-16 border-t border-slate-200 pt-8 dark:border-slate-800">
+      <h2 class="mb-3 text-2xl font-bold text-heading">Get in touch</h2>
+      <p class="leading-relaxed text-muted">
+        For workshop enquiries, contact Andreas Ziegler:<br />
+        <a
+          href={`mailto:${workshop.contact}`}
+          class="break-words text-primary underline underline-offset-4 dark:text-blue-300">{workshop.contact}</a
+        >
+      </p>
+    </div>
+  </section>
+</Layout>

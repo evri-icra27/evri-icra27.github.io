@@ -1,0 +1,65 @@
+---
+import Layout from '~/layouts/PageLayout.astro';
+import PageIntro from '~/components/workshop/PageIntro.astro';
+import { topics, workshop } from '~/data/workshop';
+---
+
+<Layout
+  metadata={{
+    title: 'Call for papers',
+    description:
+      'Planned contributions, submission information, and important dates for the proposed EVRI workshop at ICRA 2027.',
+  }}
+>
+  <PageIntro
+    title="Call for papers"
+    description="We plan to welcome research and demonstrations exploring event-based vision and neuromorphic sensing for real-world robotics."
+  />
+  <div class="mx-auto max-w-4xl space-y-12 px-4 pb-16 sm:px-6 md:pb-24">
+    <section class="rounded-xl bg-slate-100 p-6 dark:bg-slate-800" aria-labelledby="submission-status">
+      <h2 id="submission-status" class="mb-3 text-xl font-bold text-heading">Submissions are not yet open</h2>
+      <p class="leading-relaxed text-muted">
+        This workshop is currently proposed for ICRA 2027. The final call, submission portal, and deadlines will be
+        published following confirmation.
+      </p>
+    </section>
+    <section aria-labelledby="contributions-title">
+      <h2 id="contributions-title" class="mb-4 text-2xl font-bold text-heading">Planned contributions</h2>
+      <p class="leading-relaxed text-muted">
+        The draft format includes non-archival short papers (up to four pages plus references) and demo abstracts, with
+        oral presentations, posters, and demonstrations. Formatting and review instructions will be confirmed in the
+        final call.
+      </p>
+    </section>
+    <section aria-labelledby="topics-title">
+      <h2 id="topics-title" class="mb-4 text-2xl font-bold text-heading">Topics of interest</h2>
+      <ul class="list-disc space-y-3 pl-5 text-muted">
+        {topics.map(({ description }) => <li class="pl-1 leading-relaxed">{description}</li>)}
+        <li class="pl-1 leading-relaxed">
+          Simulation, sim-to-real transfer, datasets, and evaluation for event-driven robotics.
+        </li>
+      </ul>
+    </section>
+    <section aria-labelledby="dates-title">
+      <h2 id="dates-title" class="mb-4 text-2xl font-bold text-heading">Important dates</h2>
+      <dl class="divide-y divide-slate-200 dark:divide-slate-800">
+        {
+          ['Submission deadline', 'Acceptance notification', 'Camera-ready deadline', 'Workshop date'].map((label) => (
+            <div class="flex flex-wrap justify-between gap-2 py-4">
+              <>
+                <dt class="font-medium">{label}</dt>
+                <dd class="text-muted">To be announced</dd>
+              </>
+            </div>
+          ))
+        }
+      </dl>
+    </section>
+    <p class="text-muted">
+      Submission enquiries: <a
+        href={`mailto:${workshop.contact}`}
+        class="break-words text-primary underline underline-offset-4 dark:text-blue-300">{workshop.contact}</a
+      >
+    </p>
+  </div>
+</Layout>

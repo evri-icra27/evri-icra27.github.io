@@ -1,0 +1,44 @@
+---
+import Image from '~/components/common/Image.astro';
+import { organisers } from '~/data/workshop';
+---
+
+<ul class="grid gap-x-8 gap-y-12 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+  {
+    organisers.map(({ name, affiliation, website, photo }) => (
+      <li class="text-center">
+        {photo ? (
+          <Image
+            src={photo}
+            alt={`Portrait of ${name}`}
+            width={144}
+            height={144}
+            layout="fixed"
+            class="mx-auto h-36 w-36 rounded-full object-cover"
+          />
+        ) : (
+          <div class="mx-auto flex h-36 w-36 flex-col items-center justify-center rounded-full bg-slate-100 dark:bg-slate-800">
+            <span aria-hidden="true" class="text-3xl font-semibold text-slate-500 dark:text-slate-300">
+              {name
+                .split(' ')
+                .map((part) => part[0])
+                .join('')}
+            </span>
+            <span class="mt-2 text-xs text-muted">Photo to come</span>
+          </div>
+        )}
+        <h2 class="mt-5 text-lg font-bold text-heading">{name}</h2>
+        <p class="mt-1 text-sm leading-relaxed text-muted">{affiliation}</p>
+        {website && (
+          <a
+            href={website}
+            class="mt-3 inline-block text-sm font-medium text-primary underline underline-offset-4 dark:text-blue-300"
+            aria-label={`${name}: profile`}
+          >
+            Profile <span aria-hidden="true">↗</span>
+          </a>
+        )}
+      </li>
+    ))
+  }
+</ul>

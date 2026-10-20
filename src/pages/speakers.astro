@@ -1,0 +1,30 @@
+---
+import Layout from '~/layouts/PageLayout.astro';
+import PageIntro from '~/components/workshop/PageIntro.astro';
+import Button from '~/components/ui/Button.astro';
+import { getPermalink } from '~/utils/permalinks';
+---
+
+<Layout
+  metadata={{
+    title: 'Speakers',
+    description: 'Invited speaker announcements for the proposed EVRI workshop at ICRA 2027.',
+  }}
+>
+  <PageIntro
+    title="Speakers"
+    description="Perspectives from event-based vision, robotics, neuromorphic computing, and embodied AI."
+  />
+  <section class="mx-auto max-w-4xl px-4 pb-16 sm:px-6 md:pb-24" aria-labelledby="speakers-status">
+    <div class="rounded-2xl border border-slate-200 p-6 md:p-10 dark:border-slate-700">
+      <p class="mb-3 text-sm font-semibold uppercase tracking-wide text-primary dark:text-blue-300">To be announced</p>
+      <h2 id="speakers-status" class="mb-4 text-2xl font-bold text-heading">The speaker line-up is taking shape</h2>
+      <p class="mb-6 leading-relaxed text-muted">
+        Invited speakers, talk titles, and biographies will appear here as participation is confirmed. The planned
+        sessions span event sensing, agile state estimation, driving perception, foundation models, and neuromorphic
+        manipulation.
+      </p>
+      <Button href={getPermalink('/program')}>Explore the planned program</Button>
+    </div>
+  </section>
+</Layout>
