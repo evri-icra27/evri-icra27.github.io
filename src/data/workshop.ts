@@ -18,6 +18,7 @@ import shihanPengPhoto from '~/assets/images/organisers/shihan-peng.jpg';
 import xinleiChenPhoto from '~/assets/images/organisers/xinlei-chen.jpg';
 import huiXiongPhoto from '~/assets/images/organisers/hui-xiong.jpg';
 import gimHeeLeePhoto from '~/assets/images/organisers/gim-hee-lee.jpg';
+import amoghJoshiPhoto from '~/assets/images/organisers/amogh-joshi.jpg';
 import hyunsurkRyuPhoto from '~/assets/images/speakers/hyunsurk-ryu.jpg';
 import danielGehrigPhoto from '~/assets/images/speakers/daniel-gehrig.jpg';
 import hoonheeChoPhoto from '~/assets/images/speakers/hoonhee-cho.jpg';
@@ -112,6 +113,7 @@ export const organisers: Organiser[] = [
     website: 'https://www.comp.nus.edu.sg/~leegh/',
     photo: gimHeeLeePhoto,
   },
+  { name: 'Amogh Joshi', affiliation: 'Purdue University', photo: amoghJoshiPhoto },
 ];
 
 export interface Speaker {
