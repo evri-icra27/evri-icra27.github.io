@@ -105,6 +105,22 @@ export const organisers: Organiser[] = [
   },
 ];
 
+export const speakers = [
+  { name: 'Hyunsurk (Eric) Ryu', affiliation: 'NRV', topic: 'Event sensing and neuromorphic hardware' },
+  {
+    name: 'Daniel Gehrig',
+    affiliation: 'University of Pennsylvania',
+    topic: 'Event-based SLAM and VIO for agile robots',
+  },
+  { name: 'Hoonhee Cho', affiliation: 'KAIST', topic: 'Event-based perception for autonomous driving and robotics' },
+  { name: 'Guillermo Gallego', affiliation: 'TU Berlin', topic: 'Event-based stereo and motion estimation' },
+  { name: 'Peiqi Duan', affiliation: 'Peking University', topic: 'Event foundation models for robotic perception' },
+  { name: 'Alper Yegenoglu', affiliation: 'Paderborn University', topic: 'Spiking neural networks for embodied AI' },
+  { name: 'Zeyu Xiao', affiliation: 'University of Trento', topic: 'Event-based scene reasoning' },
+  { name: 'Min Liu', affiliation: 'DVSense', topic: 'Event-based multimodal fusion for autonomous driving' },
+  { name: 'Rongfei Nong', affiliation: 'Forma AI', topic: 'From event sensing to embodied world interaction' },
+];
+
 export const topics = [
   {
     title: 'Perception & navigation',

@@ -2,51 +2,68 @@
 import Layout from '~/layouts/PageLayout.astro';
 import PageIntro from '~/components/workshop/PageIntro.astro';
 
-const sessions = [
+const schedule = [
+  { time: '08:30', title: 'Opening remarks' },
+  { time: '08:45', title: 'Tutorial: event cameras for roboticists' },
+  { time: '09:15', title: 'Invited talks: event sensing and agile state estimation' },
+  { time: '10:15', title: 'Challenge introduction' },
+  { time: '10:30', title: 'Coffee break and posters', isBreak: true },
+  { time: '11:00', title: 'Invited talks: driving perception and multimodal fusion' },
+  { time: '12:00', title: 'Contributed oral presentations' },
+  { time: '12:30', title: 'Lunch', isBreak: true },
+  { time: '14:00', title: 'Invited talks: event foundation models, VLAs, and SNNs' },
+  { time: '15:00', title: 'Challenge results and winners’ presentations' },
+  { time: '15:30', title: 'Posters and robot/system demos (with coffee)', isBreak: true },
+  { time: '16:30', title: 'Invited talk: neuromorphic tactile sensing and manipulation' },
+  { time: '17:00', title: 'Panel discussion' },
+  { time: '17:45', title: 'Closing remarks and awards' },
+];
+
+const challenges = [
+  { title: 'EvSLAM', description: 'SLAM, VO, and VIO under high-speed 6-DoF motion.' },
+  { title: 'eAP TTC', description: 'Object time-to-contact from synchronised RGB and event data in driving scenes.' },
   {
-    title: 'Tutorial & invited talks',
-    description:
-      'An introduction to event cameras for roboticists, followed by talks spanning perception, state estimation, and embodied intelligence.',
-  },
-  {
-    title: 'Contributed research',
-    description: 'Short oral presentations and posters highlighting work from the community.',
-  },
-  {
-    title: 'Benchmark challenges',
-    description:
-      'Planned challenges in event-based SLAM, time-to-contact estimation, and 3D detection for autonomous driving.',
-  },
-  {
-    title: 'Robot & system demonstrations',
-    description: 'A chance to share working systems and discuss practical lessons from deployment.',
-  },
-  {
-    title: 'Panel & open discussion',
-    description: 'A closing conversation about the opportunities and challenges for event-driven robotics.',
+    title: 'eAP 3D Detection',
+    description: 'Event-enhanced 3D object detection with RGB, event, LiDAR, and GNSS-IMU data.',
   },
 ];
 ---
 
-<Layout metadata={{ title: 'Program', description: 'The proposed format for the EVRI workshop at ICRA 2027.' }}>
+<Layout metadata={{ title: 'Program', description: 'The tentative schedule for the EVRI workshop at ICRA 2027.' }}>
   <PageIntro
     title="Program"
-    description="A proposed full-day workshop, connecting event-based sensing with real-world robotic perception and action."
+    description="A full day following the sensing → perception → reasoning → action loop, from event cameras to embodied intelligence."
   />
-  <section class="mx-auto max-w-4xl px-4 pb-16 sm:px-6 md:pb-24" aria-labelledby="format-title">
-    <p class="mb-10 rounded-xl bg-slate-100 p-5 text-muted dark:bg-slate-800">
-      The workshop date, room, and detailed timetable will be announced following confirmation.
-    </p>
-    <h2 id="format-title" class="mb-6 text-2xl font-bold text-heading">Planned format</h2>
-    <ul class="divide-y divide-slate-200 dark:divide-slate-800">
-      {
-        sessions.map(({ title, description }) => (
-          <li class="py-6 first:pt-0">
-            <h3 class="mb-2 text-xl font-semibold text-heading">{title}</h3>
-            <p class="leading-relaxed text-muted">{description}</p>
-          </li>
-        ))
-      }
-    </ul>
-  </section>
+  <div class="mx-auto max-w-4xl space-y-14 px-4 pb-16 sm:px-6 md:pb-24">
+    <section aria-labelledby="schedule-title">
+      <h2 id="schedule-title" class="mb-2 text-2xl font-bold text-heading">Tentative schedule</h2>
+      <p class="mb-6 text-sm text-muted">Times are provisional. Date and room to be announced.</p>
+      <ol class="divide-y divide-slate-200 dark:divide-slate-800">
+        {
+          schedule.map(({ time, title, isBreak }) => (
+            <li class="flex gap-6 py-3">
+              <span class="w-12 shrink-0 font-medium tabular-nums text-muted">{time}</span>
+              <span class={isBreak ? 'italic text-muted' : 'text-heading'}>{title}</span>
+            </li>
+          ))
+        }
+      </ol>
+    </section>
+    <section aria-labelledby="challenges-title">
+      <h2 id="challenges-title" class="mb-4 text-2xl font-bold text-heading">Challenges</h2>
+      <ul class="mb-4 space-y-3">
+        {
+          challenges.map(({ title, description }) => (
+            <li class="leading-relaxed text-muted">
+              <span class="font-semibold text-heading">{title}</span> — {description}
+            </li>
+          ))
+        }
+      </ul>
+      <p class="leading-relaxed text-muted">
+        Datasets, metrics, and baselines will be released ahead of time, with a public leaderboard. Top teams present at
+        the workshop.
+      </p>
+    </section>
+  </div>
 </Layout>
