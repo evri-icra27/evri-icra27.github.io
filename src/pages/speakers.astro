@@ -1,6 +1,7 @@
 ---
 import Layout from '~/layouts/PageLayout.astro';
 import PageIntro from '~/components/workshop/PageIntro.astro';
+import Image from '~/components/common/Image.astro';
 import { speakers } from '~/data/workshop';
 ---
 
@@ -14,19 +15,31 @@ import { speakers } from '~/data/workshop';
     title="Speakers"
     description="Perspectives from event-based vision, robotics, neuromorphic computing, and embodied AI."
   />
-  <section class="mx-auto max-w-4xl px-4 pb-16 sm:px-6 md:pb-24" aria-labelledby="speakers-title">
-    <h2 id="speakers-title" class="mb-6 text-2xl font-bold text-heading">Confirmed speakers</h2>
-    <ul class="divide-y divide-slate-200 dark:divide-slate-800">
+  <section class="mx-auto max-w-6xl px-4 pb-16 sm:px-6 md:pb-24" aria-labelledby="speakers-title">
+    <h2 id="speakers-title" class="mb-10 text-2xl font-bold text-heading">Confirmed speakers</h2>
+    <ul class="grid gap-x-8 gap-y-12 sm:grid-cols-2 lg:grid-cols-3">
       {
-        speakers.map(({ name, affiliation, topic }) => (
-          <li class="py-5 first:pt-0">
-            <h3 class="text-lg font-semibold text-heading">{name}</h3>
-            <p class="text-sm text-muted">{affiliation}</p>
-            <p class="mt-1 leading-relaxed">{topic}</p>
+        speakers.map(({ name, affiliation, topic, photo }) => (
+          <li class="text-center">
+            {photo ? (
+              <Image
+                src={photo}
+                alt={`Portrait of ${name}`}
+                width={144}
+                height={144}
+                layout="fixed"
+                class="mx-auto h-36 w-36 rounded-full object-cover ring-1 ring-slate-200 dark:ring-slate-700"
+              />
+            ) : (
+              <div class="mx-auto h-36 w-36 rounded-full bg-slate-100 dark:bg-slate-800" />
+            )}
+            <h3 class="mt-5 text-lg font-bold text-heading">{name}</h3>
+            <p class="mt-1 text-sm text-muted">{affiliation}</p>
+            <p class="mt-2 leading-relaxed">{topic}</p>
           </li>
         ))
       }
     </ul>
-    <p class="mt-8 text-muted">Further speakers and panellists will be announced.</p>
+    <p class="mt-16 text-muted">Further speakers and panellists will be announced.</p>
   </section>
 </Layout>

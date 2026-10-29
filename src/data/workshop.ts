@@ -1,5 +1,5 @@
 // Initial content from the workshop proposal. Keep unconfirmed details provisional.
-// Headshots live in src/assets/images/organisers as 400x400 face-centred square crops.
+// Headshots live in src/assets/images/{organisers,speakers} as 400x400 face-centred square crops.
 import type { ImageMetadata } from 'astro';
 import andreasZieglerPhoto from '~/assets/images/organisers/andreas-ziegler.jpg';
 import hanyuZhouPhoto from '~/assets/images/organisers/hanyu-zhou.jpg';
@@ -18,6 +18,15 @@ import shihanPengPhoto from '~/assets/images/organisers/shihan-peng.jpg';
 import xinleiChenPhoto from '~/assets/images/organisers/xinlei-chen.jpg';
 import huiXiongPhoto from '~/assets/images/organisers/hui-xiong.jpg';
 import gimHeeLeePhoto from '~/assets/images/organisers/gim-hee-lee.jpg';
+import hyunsurkRyuPhoto from '~/assets/images/speakers/hyunsurk-ryu.jpg';
+import danielGehrigPhoto from '~/assets/images/speakers/daniel-gehrig.jpg';
+import hoonheeChoPhoto from '~/assets/images/speakers/hoonhee-cho.jpg';
+import guillermoGallegoPhoto from '~/assets/images/speakers/guillermo-gallego.jpg';
+import peiqiDuanPhoto from '~/assets/images/speakers/peiqi-duan.jpg';
+import alperYegenogluPhoto from '~/assets/images/speakers/alper-yegenoglu.jpg';
+import zeyuXiaoPhoto from '~/assets/images/speakers/zeyu-xiao.jpg';
+import minLiuPhoto from '~/assets/images/speakers/min-liu.jpg';
+import rongfeiNongPhoto from '~/assets/images/speakers/rongfei-nong.jpg';
 
 export const workshop = {
   title: 'Event-Based Vision for Real-World Robotics',
@@ -105,20 +114,68 @@ export const organisers: Organiser[] = [
   },
 ];
 
-export const speakers = [
-  { name: 'Hyunsurk (Eric) Ryu', affiliation: 'NRV', topic: 'Event sensing and neuromorphic hardware' },
+export interface Speaker {
+  name: string;
+  affiliation: string;
+  topic: string;
+  photo?: ImageMetadata;
+}
+
+export const speakers: Speaker[] = [
+  {
+    name: 'Hyunsurk (Eric) Ryu',
+    affiliation: 'NRV',
+    topic: 'Event sensing and neuromorphic hardware',
+    photo: hyunsurkRyuPhoto,
+  },
   {
     name: 'Daniel Gehrig',
     affiliation: 'University of Pennsylvania',
     topic: 'Event-based SLAM and VIO for agile robots',
+    photo: danielGehrigPhoto,
   },
-  { name: 'Hoonhee Cho', affiliation: 'KAIST', topic: 'Event-based perception for autonomous driving and robotics' },
-  { name: 'Guillermo Gallego', affiliation: 'TU Berlin', topic: 'Event-based stereo and motion estimation' },
-  { name: 'Peiqi Duan', affiliation: 'Peking University', topic: 'Event foundation models for robotic perception' },
-  { name: 'Alper Yegenoglu', affiliation: 'Paderborn University', topic: 'Spiking neural networks for embodied AI' },
-  { name: 'Zeyu Xiao', affiliation: 'University of Trento', topic: 'Event-based scene reasoning' },
-  { name: 'Min Liu', affiliation: 'DVSense', topic: 'Event-based multimodal fusion for autonomous driving' },
-  { name: 'Rongfei Nong', affiliation: 'Forma AI', topic: 'From event sensing to embodied world interaction' },
+  {
+    name: 'Hoonhee Cho',
+    affiliation: 'KAIST',
+    topic: 'Event-based perception for autonomous driving and robotics',
+    photo: hoonheeChoPhoto,
+  },
+  {
+    name: 'Guillermo Gallego',
+    affiliation: 'TU Berlin',
+    topic: 'Event-based stereo and motion estimation',
+    photo: guillermoGallegoPhoto,
+  },
+  {
+    name: 'Peiqi Duan',
+    affiliation: 'Peking University',
+    topic: 'Event foundation models for robotic perception',
+    photo: peiqiDuanPhoto,
+  },
+  {
+    name: 'Alper Yegenoglu',
+    affiliation: 'Paderborn University',
+    topic: 'Spiking neural networks for embodied AI',
+    photo: alperYegenogluPhoto,
+  },
+  {
+    name: 'Zeyu Xiao',
+    affiliation: 'University of Trento',
+    topic: 'Event-based scene reasoning',
+    photo: zeyuXiaoPhoto,
+  },
+  {
+    name: 'Min Liu',
+    affiliation: 'DVSense',
+    topic: 'Event-based multimodal fusion for autonomous driving',
+    photo: minLiuPhoto,
+  },
+  {
+    name: 'Rongfei Nong',
+    affiliation: 'Forma AI',
+    topic: 'From event sensing to embodied world interaction',
+    photo: rongfeiNongPhoto,
+  },
 ];
 
 export const topics = [
