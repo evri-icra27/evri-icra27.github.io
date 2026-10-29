@@ -1,0 +1,240 @@
+---
+// Decorative backdrop that simulates an event camera: moving edges fire ON (blue) and
+// OFF (red) events that fade out like a time surface. Purely random, purely decorative.
+interface Props {
+  class?: string;
+}
+const { class: className = '' } = Astro.props;
+---
+
+<event-stream class:list={['event-stream pointer-events-none absolute inset-0 block', className]} aria-hidden="true">
+  <canvas></canvas>
+</event-stream>
+
+<style>
+  .event-stream {
+    opacity: 0.55;
+    /* Fade out towards every edge and dim the centre so text on top stays readable. */
+    mask-image:
+      linear-gradient(to bottom, transparent, #000 18%, #000 72%, transparent),
+      radial-gradient(ellipse 55% 50% at 50% 50%, rgb(0 0 0 / 0.35), #000);
+    mask-composite: intersect;
+    -webkit-mask-composite: source-in;
+  }
+  :global(.dark) .event-stream {
+    opacity: 0.7;
+  }
+  /* On narrow screens text spans the full width, so there is no quiet margin to play in. */
+  @media (max-width: 767px) {
+    .event-stream,
+    :global(.dark) .event-stream {
+      opacity: 0.35;
+    }
+  }
+  canvas {
+    width: 100%;
+    height: 100%;
+    image-rendering: pixelated;
+  }
+</style>
+
+<script>
+  const CELL = 3; // CSS pixels per sensor pixel
+  const TAU = 0.28; // seconds for an event to fade
+  const NOISE_RATE = 0.0025; // background events per pixel per second
+  const CONTRAST = 1.4; // edge events per pixel of normal motion
+  const ON = [59, 130, 246];
+  const OFF = [239, 68, 68];
+
+  type Shape = {
+    kind: 'disk' | 'bar';
+    x: number;
+    y: number;
+    vx: number;
+    vy: number;
+    size: number; // disk radius or bar half-length
+    angle: number;
+    spin: number;
+  };
+
+  const rand = (a: number, b: number) => a + Math.random() * (b - a);
+
+  class EventStream extends HTMLElement {
+    canvas!: HTMLCanvasElement;
+    ctx!: CanvasRenderingContext2D;
+    image!: ImageData;
+    w = 0;
+    h = 0;
+    stamp = new Float32Array(0); // time of the last event at each pixel
+    polarity = new Int8Array(0);
+    shapes: Shape[] = [];
+    t = 0;
+    last = 0;
+    frame = 0;
+    visible = true;
+    reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    resizer = new ResizeObserver(() => this.resize());
+    observer = new IntersectionObserver(([entry]) => {
+      this.visible = entry.isIntersecting;
+      this.schedule();
+    });
+
+    connectedCallback() {
+      this.canvas = this.querySelector('canvas')!;
+      this.ctx = this.canvas.getContext('2d')!;
+      this.resizer.observe(this);
+      this.observer.observe(this);
+      document.addEventListener('visibilitychange', this.schedule);
+    }
+
+    disconnectedCallback() {
+      cancelAnimationFrame(this.frame);
+      this.resizer.disconnect();
+      this.observer.disconnect();
+      document.removeEventListener('visibilitychange', this.schedule);
+    }
+
+    resize() {
+      const w = Math.max(1, Math.ceil(this.clientWidth / CELL));
+      const h = Math.max(1, Math.ceil(this.clientHeight / CELL));
+      if (w === this.w && h === this.h) return;
+      this.w = this.canvas.width = w;
+      this.h = this.canvas.height = h;
+      this.image = this.ctx.createImageData(w, h);
+      this.stamp = new Float32Array(w * h).fill(-Infinity);
+      this.polarity = new Int8Array(w * h);
+      const count = Math.round(Math.min(9, Math.max(4, (w * h) / 9000)));
+      this.shapes = Array.from({ length: count }, () => this.spawn(true));
+      if (this.reduced) {
+        // Show a single, still snapshot of accumulated events.
+        for (let i = 0; i < 40; i++) this.step(1 / 60);
+        this.draw();
+      } else {
+        this.schedule();
+      }
+    }
+
+    spawn(anywhere = false): Shape {
+      const kind = Math.random() < 0.6 ? 'disk' : 'bar';
+      const speed = rand(12, 45);
+      const heading = rand(0, Math.PI * 2);
+      const size = kind === 'disk' ? rand(5, 18) : rand(12, 30);
+      let x = rand(0, this.w);
+      let y = rand(0, this.h);
+      if (!anywhere) {
+        // Enter from just outside the edge the shape is moving away from.
+        const vx = Math.cos(heading);
+        const vy = Math.sin(heading);
+        if (Math.abs(vx) > Math.abs(vy)) x = vx > 0 ? -size : this.w + size;
+        else y = vy > 0 ? -size : this.h + size;
+      }
+      return {
+        kind,
+        x,
+        y,
+        vx: Math.cos(heading) * speed,
+        vy: Math.sin(heading) * speed,
+        size,
+        angle: rand(0, Math.PI),
+        spin: kind === 'bar' ? rand(-1.6, 1.6) : 0,
+      };
+    }
+
+    emit(px: number, py: number, pol: number) {
+      const x = Math.round(px + rand(-0.6, 0.6));
+      const y = Math.round(py + rand(-0.6, 0.6));
+      if (x < 0 || y < 0 || x >= this.w || y >= this.h) return;
+      const i = y * this.w + x;
+      this.stamp[i] = this.t;
+      this.polarity[i] = pol;
+    }
+
+    // An edge point fires with probability proportional to its motion along the edge
+    // normal; the sign of that motion decides the polarity (leading ON, trailing OFF).
+    edge(px: number, py: number, nx: number, ny: number, vx: number, vy: number, dt: number) {
+      const flow = nx * vx + ny * vy;
+      if (Math.random() < Math.abs(flow) * dt * CONTRAST) this.emit(px, py, flow > 0 ? 1 : -1);
+    }
+
+    step(dt: number) {
+      this.t += dt;
+      const margin = 40;
+      this.shapes = this.shapes.map((s) => {
+        s.x += s.vx * dt;
+        s.y += s.vy * dt;
+        s.angle += s.spin * dt;
+        const out = s.x < -margin || s.y < -margin || s.x > this.w + margin || s.y > this.h + margin;
+        return out ? this.spawn() : s;
+      });
+
+      for (const s of this.shapes) {
+        if (s.kind === 'disk') {
+          const n = Math.ceil(2 * Math.PI * s.size * 1.4);
+          for (let k = 0; k < n; k++) {
+            const a = (k / n) * Math.PI * 2;
+            const nx = Math.cos(a);
+            const ny = Math.sin(a);
+            this.edge(s.x + nx * s.size, s.y + ny * s.size, nx, ny, s.vx, s.vy, dt);
+          }
+        } else {
+          const dx = Math.cos(s.angle);
+          const dy = Math.sin(s.angle);
+          const nx = -dy;
+          const ny = dx;
+          const n = Math.ceil(s.size * 2 * 1.4);
+          for (let k = 0; k <= n; k++) {
+            const r = (k / n - 0.5) * 2 * s.size;
+            // Point velocity is translation plus rotation about the bar centre.
+            const vx = s.vx - s.spin * r * dy;
+            const vy = s.vy + s.spin * r * dx;
+            const px = s.x + dx * r;
+            const py = s.y + dy * r;
+            this.edge(px + nx, py + ny, nx, ny, vx, vy, dt);
+            this.edge(px - nx, py - ny, -nx, -ny, vx, vy, dt);
+          }
+        }
+      }
+
+      const noise = this.w * this.h * NOISE_RATE * dt;
+      for (let k = 0; k < noise || Math.random() < noise - k; k++) {
+        this.emit(rand(0, this.w), rand(0, this.h), Math.random() < 0.5 ? 1 : -1);
+      }
+    }
+
+    draw() {
+      const data = this.image.data;
+      for (let i = 0; i < this.stamp.length; i++) {
+        const age = this.t - this.stamp[i];
+        const o = i * 4;
+        if (age > TAU * 4) {
+          data[o + 3] = 0;
+          continue;
+        }
+        const c = this.polarity[i] > 0 ? ON : OFF;
+        data[o] = c[0];
+        data[o + 1] = c[1];
+        data[o + 2] = c[2];
+        data[o + 3] = 255 * Math.exp(-age / TAU);
+      }
+      this.ctx.putImageData(this.image, 0, 0);
+    }
+
+    tick = (now: number) => {
+      const dt = this.last ? Math.min((now - this.last) / 1000, 0.05) : 1 / 60;
+      this.last = now;
+      this.step(dt);
+      this.draw();
+      this.frame = requestAnimationFrame(this.tick);
+    };
+
+    schedule = () => {
+      cancelAnimationFrame(this.frame);
+      this.last = 0;
+      if (!this.reduced && this.visible && !document.hidden && this.w) {
+        this.frame = requestAnimationFrame(this.tick);
+      }
+    };
+  }
+
+  if (!customElements.get('event-stream')) customElements.define('event-stream', EventStream);
+</script>

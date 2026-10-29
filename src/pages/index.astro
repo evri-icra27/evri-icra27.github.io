@@ -1,6 +1,7 @@
 ---
 import Layout from '~/layouts/PageLayout.astro';
 import Hero from '~/components/widgets/Hero.astro';
+import EventStream from '~/components/workshop/EventStream.astro';
 import Features from '~/components/widgets/Features.astro';
 import Button from '~/components/ui/Button.astro';
 import StructuredData from '~/components/common/StructuredData.astro';
@@ -20,20 +21,24 @@ const structuredData = {
 
 <Layout metadata={metadata}>
   <StructuredData slot="head" schema={structuredData} />
-  <Hero
-    badge={workshop.status}
-    tagline={workshop.conference}
-    title={workshop.title}
-    subtitle={workshop.subtitle}
-    actions={[
-      { text: 'Explore the program', href: getPermalink('/program'), variant: 'primary' },
-      { text: 'Call for papers', href: getPermalink('/call-for-papers') },
-    ]}
-  >
-    <Fragment slot="content">
-      <p class="mt-8 text-sm text-muted">{workshop.location} · Proposed full-day workshop · Date to be confirmed</p>
-    </Fragment>
-  </Hero>
+  {/* Hero renders its bg slot as an HTML string, which would drop the banner's script. */}
+  <div class="relative">
+    <EventStream />
+    <Hero
+      badge={workshop.status}
+      tagline={workshop.conference}
+      title={workshop.title}
+      subtitle={workshop.subtitle}
+      actions={[
+        { text: 'Explore the program', href: getPermalink('/program'), variant: 'primary' },
+        { text: 'Call for papers', href: getPermalink('/call-for-papers') },
+      ]}
+    >
+      <Fragment slot="content">
+        <p class="mt-8 text-sm text-muted">{workshop.location} · Proposed full-day workshop · Date to be confirmed</p>
+      </Fragment>
+    </Hero>
+  </div>
 
   <section class="border-y border-slate-200 bg-slate-50 py-12 dark:border-slate-800 dark:bg-slate-900/50">
     <div class="mx-auto max-w-4xl px-4 sm:px-6">
