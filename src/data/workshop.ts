@@ -1,6 +1,23 @@
 // Initial content from the workshop proposal. Keep unconfirmed details provisional.
-// Add headshots by importing images from src/assets/images/organisers and setting photo.
+// Headshots live in src/assets/images/organisers as 400x400 face-centred square crops.
 import type { ImageMetadata } from 'astro';
+import andreasZieglerPhoto from '~/assets/images/organisers/andreas-ziegler.jpg';
+import hanyuZhouPhoto from '~/assets/images/organisers/hanyu-zhou.jpg';
+import kukJinYoonPhoto from '~/assets/images/organisers/kuk-jin-yoon.jpg';
+import youngMinKimPhoto from '~/assets/images/organisers/young-min-kim.jpg';
+import shintaroShibaPhoto from '~/assets/images/organisers/shintaro-shiba.jpg';
+import yiZhouPhoto from '~/assets/images/organisers/yi-zhou.jpg';
+import yunfanLuPhoto from '~/assets/images/organisers/yunfan-lu.jpg';
+import arrenGloverPhoto from '~/assets/images/organisers/arren-glover.jpg';
+import adamHinesPhoto from '~/assets/images/organisers/adam-hines.jpg';
+import haoyueLiuPhoto from '~/assets/images/organisers/haoyue-liu.jpg';
+import sebnemSariozkanPhoto from '~/assets/images/organisers/sebnem-sariozkan.jpg';
+import caterinaCaccavellaPhoto from '~/assets/images/organisers/caterina-caccavella.jpg';
+import shengqiXuPhoto from '~/assets/images/organisers/shengqi-xu.jpg';
+import shihanPengPhoto from '~/assets/images/organisers/shihan-peng.jpg';
+import xinleiChenPhoto from '~/assets/images/organisers/xinlei-chen.jpg';
+import huiXiongPhoto from '~/assets/images/organisers/hui-xiong.jpg';
+import gimHeeLeePhoto from '~/assets/images/organisers/gim-hee-lee.jpg';
 
 export const workshop = {
   title: 'Event-Based Vision for Real-World Robotics',
@@ -19,38 +36,72 @@ export interface Organiser {
 }
 
 export const organisers: Organiser[] = [
-  { name: 'Andreas Ziegler', affiliation: 'University of Toronto', website: 'https://andreasaziegler.github.io/' },
-  { name: 'Hanyu Zhou', affiliation: 'National University of Singapore', website: 'https://hyzhouboy.github.io/' },
-  { name: 'Kuk-Jin Yoon', affiliation: 'KAIST' },
-  { name: 'Young Min Kim', affiliation: 'Seoul National University' },
-  { name: 'Shintaro Shiba', affiliation: 'University of Tokyo' },
-  { name: 'Yi Zhou', affiliation: 'Hunan University' },
+  {
+    name: 'Andreas Ziegler',
+    affiliation: 'University of Toronto',
+    website: 'https://andreasaziegler.github.io/',
+    photo: andreasZieglerPhoto,
+  },
+  {
+    name: 'Hanyu Zhou',
+    affiliation: 'National University of Singapore',
+    website: 'https://hyzhouboy.github.io/',
+    photo: hanyuZhouPhoto,
+  },
+  { name: 'Kuk-Jin Yoon', affiliation: 'KAIST', photo: kukJinYoonPhoto },
+  { name: 'Young Min Kim', affiliation: 'Seoul National University', photo: youngMinKimPhoto },
+  { name: 'Shintaro Shiba', affiliation: 'University of Tokyo', photo: shintaroShibaPhoto },
+  { name: 'Yi Zhou', affiliation: 'Hunan University', photo: yiZhouPhoto },
   {
     name: 'Yunfan Lu',
     affiliation: 'Hong Kong University of Science and Technology',
     website: 'https://yunfanlu.github.io/',
+    photo: yunfanLuPhoto,
   },
-  { name: 'Arren Glover', affiliation: 'Italian Institute of Technology' },
-  { name: 'Adam Hines', affiliation: 'Queensland University of Technology' },
+  { name: 'Arren Glover', affiliation: 'Italian Institute of Technology', photo: arrenGloverPhoto },
+  { name: 'Adam Hines', affiliation: 'Queensland University of Technology', photo: adamHinesPhoto },
   {
     name: 'Haoyue Liu',
     affiliation: 'Huazhong University of Science and Technology',
     website: 'https://liu-haoyue.github.io/',
+    photo: haoyueLiuPhoto,
   },
-  { name: 'Sebnem Sariozkan', affiliation: 'Paderborn University', website: 'https://sebnem-byte.github.io/' },
-  { name: 'Caterina Caccavella', affiliation: 'ETH Zurich & ZHAW' },
-  { name: 'Shengqi Xu', affiliation: 'Fudan University', website: 'https://shengqi77.github.io/' },
-  { name: 'Shihan Peng', affiliation: 'Tsinghua University', website: 'https://pengshihan.com/' },
-  { name: 'Xinlei Chen', affiliation: 'Tsinghua University', website: 'https://chen-xinlei.com/' },
+  {
+    name: 'Sebnem Sariozkan',
+    affiliation: 'Paderborn University',
+    website: 'https://sebnem-byte.github.io/',
+    photo: sebnemSariozkanPhoto,
+  },
+  { name: 'Caterina Caccavella', affiliation: 'ETH Zurich & ZHAW', photo: caterinaCaccavellaPhoto },
+  {
+    name: 'Shengqi Xu',
+    affiliation: 'Fudan University',
+    website: 'https://shengqi77.github.io/',
+    photo: shengqiXuPhoto,
+  },
+  {
+    name: 'Shihan Peng',
+    affiliation: 'Tsinghua University',
+    website: 'https://pengshihan.com/',
+    photo: shihanPengPhoto,
+  },
+  {
+    name: 'Xinlei Chen',
+    affiliation: 'Tsinghua University',
+    website: 'https://chen-xinlei.com/',
+    photo: xinleiChenPhoto,
+  },
   {
     name: 'Hui Xiong',
     affiliation: 'Hong Kong University of Science and Technology (Guangzhou)',
     website: 'https://ailab.hkust-gz.edu.cn/',
+    photo: huiXiongPhoto,
   },
   {
     name: 'Gim Hee Lee',
     affiliation: 'National University of Singapore',
     website: 'https://www.comp.nus.edu.sg/~leegh/',
+    photo: gimHeeLeePhoto,
   },
 ];
 
