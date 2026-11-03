@@ -3,6 +3,7 @@ import Layout from '~/layouts/PageLayout.astro';
 import PageIntro from '~/components/workshop/PageIntro.astro';
 import Image from '~/components/common/Image.astro';
 import { speakers } from '~/data/workshop';
+import { getPermalink } from '~/utils/permalinks';
 ---
 
 <Layout
@@ -13,14 +14,14 @@ import { speakers } from '~/data/workshop';
 >
   <PageIntro
     title="Speakers"
-    description="Perspectives from event-based vision, robotics, neuromorphic computing, and embodied AI."
+    description="Seven invited speakers from academia and industry across Asia, Europe, and North America, covering event-based sensing, state estimation, driving perception, human motion, and neuromorphic robots."
   />
   <section class="mx-auto max-w-6xl px-4 pb-16 sm:px-6 md:pb-24" aria-labelledby="speakers-title">
     <h2 id="speakers-title" class="mb-10 text-2xl font-bold text-heading">Confirmed speakers</h2>
     <ul class="grid gap-x-8 gap-y-12 sm:grid-cols-2 lg:grid-cols-3">
       {
-        speakers.map(({ name, affiliation, topic, photo }) => (
-          <li class="text-center">
+        speakers.map(({ id, name, affiliation, topic, talkTitle, photo }, index) => (
+          <li id={id} class="scroll-mt-24 text-center">
             {photo ? (
               <Image
                 src={photo}
@@ -31,15 +32,31 @@ import { speakers } from '~/data/workshop';
                 class="mx-auto h-36 w-36 rounded-full object-cover ring-1 ring-slate-200 dark:ring-slate-700"
               />
             ) : (
-              <div class="mx-auto h-36 w-36 rounded-full bg-slate-100 dark:bg-slate-800" />
+              <div class="mx-auto flex h-36 w-36 items-center justify-center rounded-full bg-slate-100 dark:bg-slate-800">
+                <span aria-hidden="true" class="text-3xl font-semibold text-slate-500 dark:text-slate-300">
+                  {name
+                    .replace(/\s*\(.*?\)/, '')
+                    .split(' ')
+                    .map((part) => part[0])
+                    .join('')}
+                </span>
+              </div>
             )}
             <h3 class="mt-5 text-lg font-bold text-heading">{name}</h3>
             <p class="mt-1 text-sm text-muted">{affiliation}</p>
-            <p class="mt-2 leading-relaxed">{topic}</p>
+            <p class="mt-2 leading-relaxed">{talkTitle ?? topic}</p>
+            <a
+              href={getPermalink('/program')}
+              class="mt-2 inline-block text-sm text-primary underline underline-offset-4 dark:text-blue-300"
+            >
+              Invited talk {index + 1}
+            </a>
           </li>
         ))
       }
     </ul>
-    <p class="mt-16 text-muted">Further speakers and panellists will be announced.</p>
+    <p class="mt-16 text-muted">
+      All invited speakers also join the closing panel discussion. Talk titles will be announced closer to the workshop.
+    </p>
   </section>
 </Layout>

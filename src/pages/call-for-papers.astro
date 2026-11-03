@@ -13,7 +13,7 @@ import { topics, workshop } from '~/data/workshop';
 >
   <PageIntro
     title="Call for papers"
-    description="We plan to welcome research and demonstrations exploring event-based vision and neuromorphic sensing for real-world robotics."
+    description="We plan to welcome research and demonstrations on event-based vision for real-world robotics, from perception to scene understanding."
   />
   <div class="mx-auto max-w-4xl space-y-12 px-4 pb-16 sm:px-6 md:pb-24">
     <section class="rounded-xl bg-slate-100 p-6 dark:bg-slate-800" aria-labelledby="submission-status">
@@ -28,16 +28,14 @@ import { topics, workshop } from '~/data/workshop';
       <p class="leading-relaxed text-muted">
         We invite non-archival short papers (up to four pages plus references) and demo abstracts. Submissions will be
         handled via OpenReview and reviewed by at least two program committee members. The highest-rated papers will be
-        presented as orals, and all accepted papers as posters.
+        presented as spotlight talks, and all accepted papers as posters. Demos will be shown in the afternoon poster
+        session.
       </p>
     </section>
     <section aria-labelledby="topics-title">
       <h2 id="topics-title" class="mb-4 text-2xl font-bold text-heading">Topics of interest</h2>
       <ul class="list-disc space-y-3 pl-5 text-muted">
         {topics.map(({ description }) => <li class="pl-1 leading-relaxed">{description}</li>)}
-        <li class="pl-1 leading-relaxed">
-          Simulation, sim-to-real transfer, datasets, and evaluation for event-driven robotics.
-        </li>
       </ul>
     </section>
     <section aria-labelledby="dates-title">

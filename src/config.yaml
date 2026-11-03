@@ -10,7 +10,7 @@ metadata:
   title:
     default: Event-Based Vision for Real-World Robotics
     template: '%s — EVRI · ICRA 2027'
-  description: 'Event-Based Vision for Real-World Robotics: From Perception to Embodied Intelligence. A proposed full-day workshop at ICRA 2027, bringing together event-based perception and embodied AI.'
+  description: 'Event-Based Vision for Real-World Robotics: From Perception to Scene Understanding. A proposed full-day workshop at ICRA 2027 on event-based SLAM, driving perception, and scene understanding, with public benchmark challenges.'
   robots:
     index: true
     follow: true

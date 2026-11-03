@@ -5,7 +5,6 @@ import andreasZieglerPhoto from '~/assets/images/organisers/andreas-ziegler.jpg'
 import hanyuZhouPhoto from '~/assets/images/organisers/hanyu-zhou.jpg';
 import kukJinYoonPhoto from '~/assets/images/organisers/kuk-jin-yoon.jpg';
 import youngMinKimPhoto from '~/assets/images/organisers/young-min-kim.jpg';
-import shintaroShibaPhoto from '~/assets/images/organisers/shintaro-shiba.jpg';
 import yiZhouPhoto from '~/assets/images/organisers/yi-zhou.jpg';
 import yunfanLuPhoto from '~/assets/images/organisers/yunfan-lu.jpg';
 import arrenGloverPhoto from '~/assets/images/organisers/arren-glover.jpg';
@@ -23,19 +22,15 @@ import hyunsurkRyuPhoto from '~/assets/images/speakers/hyunsurk-ryu.jpg';
 import danielGehrigPhoto from '~/assets/images/speakers/daniel-gehrig.jpg';
 import hoonheeChoPhoto from '~/assets/images/speakers/hoonhee-cho.jpg';
 import guillermoGallegoPhoto from '~/assets/images/speakers/guillermo-gallego.jpg';
-import peiqiDuanPhoto from '~/assets/images/speakers/peiqi-duan.jpg';
 import alperYegenogluPhoto from '~/assets/images/speakers/alper-yegenoglu.jpg';
-import zeyuXiaoPhoto from '~/assets/images/speakers/zeyu-xiao.jpg';
-import minLiuPhoto from '~/assets/images/speakers/min-liu.jpg';
-import rongfeiNongPhoto from '~/assets/images/speakers/rongfei-nong.jpg';
 
 export const workshop = {
   title: 'Event-Based Vision for Real-World Robotics',
-  subtitle: 'From Perception to Embodied Intelligence',
+  subtitle: 'From Perception to Scene Understanding',
   conference: 'ICRA 2027',
   location: 'Seoul, South Korea',
   status: 'Proposed workshop',
-  contact: 'andreas.ziegler@utoronto.ca',
+  contact: 'andreas.ziegler@robotics.utias.utoronto.ca',
 };
 
 export interface Organiser {
@@ -45,6 +40,7 @@ export interface Organiser {
   photo?: ImageMetadata;
 }
 
+// Order follows the final proposal.
 export const organisers: Organiser[] = [
   {
     name: 'Andreas Ziegler',
@@ -60,7 +56,6 @@ export const organisers: Organiser[] = [
   },
   { name: 'Kuk-Jin Yoon', affiliation: 'KAIST', photo: kukJinYoonPhoto },
   { name: 'Young Min Kim', affiliation: 'Seoul National University', photo: youngMinKimPhoto },
-  { name: 'Shintaro Shiba', affiliation: 'University of Tokyo', photo: shintaroShibaPhoto },
   { name: 'Yi Zhou', affiliation: 'Hunan University', photo: yiZhouPhoto },
   {
     name: 'Yunfan Lu',
@@ -68,7 +63,7 @@ export const organisers: Organiser[] = [
     website: 'https://yunfanlu.github.io/',
     photo: yunfanLuPhoto,
   },
-  { name: 'Arren Glover', affiliation: 'Italian Institute of Technology', photo: arrenGloverPhoto },
+  { name: 'Arren Glover', affiliation: 'Italian Institute of Technology (IIT)', photo: arrenGloverPhoto },
   { name: 'Adam Hines', affiliation: 'Queensland University of Technology', photo: adamHinesPhoto },
   {
     name: 'Haoyue Liu',
@@ -95,6 +90,7 @@ export const organisers: Organiser[] = [
     website: 'https://pengshihan.com/',
     photo: shihanPengPhoto,
   },
+  { name: 'Amogh Joshi', affiliation: 'Purdue University', photo: amoghJoshiPhoto },
   {
     name: 'Xinlei Chen',
     affiliation: 'Tsinghua University',
@@ -113,87 +109,123 @@ export const organisers: Organiser[] = [
     website: 'https://www.comp.nus.edu.sg/~leegh/',
     photo: gimHeeLeePhoto,
   },
-  { name: 'Amogh Joshi', affiliation: 'Purdue University', photo: amoghJoshiPhoto },
 ];
 
 export interface Speaker {
+  /** Anchor on the speakers page, referenced from the program. */
+  id: string;
   name: string;
   affiliation: string;
+  /** Expected topic from the proposal. */
   topic: string;
+  /** Confirmed talk title, once known. */
+  talkTitle?: string;
   photo?: ImageMetadata;
 }
 
+// Confirmed invited speakers, in talk order (Talk 1–7). Backup speakers from the proposal are not listed publicly.
 export const speakers: Speaker[] = [
   {
+    id: 'hyunsurk-ryu',
     name: 'Hyunsurk (Eric) Ryu',
-    affiliation: 'NRV',
-    topic: 'Event sensing and neuromorphic hardware',
+    affiliation: 'NRV (industry)',
+    topic: 'Event-based sensing and neuromorphic hardware',
     photo: hyunsurkRyuPhoto,
   },
   {
+    id: 'daniel-gehrig',
     name: 'Daniel Gehrig',
     affiliation: 'University of Pennsylvania',
     topic: 'Event-based SLAM and VIO for agile robots',
     photo: danielGehrigPhoto,
   },
   {
-    name: 'Hoonhee Cho',
-    affiliation: 'KAIST',
-    topic: 'Event-based perception for autonomous driving and robotics',
-    photo: hoonheeChoPhoto,
-  },
-  {
+    id: 'guillermo-gallego',
     name: 'Guillermo Gallego',
     affiliation: 'TU Berlin',
     topic: 'Event-based stereo and motion estimation',
     photo: guillermoGallegoPhoto,
   },
   {
-    name: 'Peiqi Duan',
-    affiliation: 'Peking University',
-    topic: 'Event foundation models for robotic perception',
-    photo: peiqiDuanPhoto,
+    id: 'hoonhee-cho',
+    name: 'Hoonhee Cho',
+    affiliation: 'KAIST',
+    topic: 'Event-based perception for autonomous driving and robotics',
+    talkTitle: 'Event-based perception for autonomous driving and robotics',
+    photo: hoonheeChoPhoto,
   },
   {
+    id: 'gaurvi-goyal',
+    name: 'Gaurvi Goyal',
+    affiliation: 'Maastricht University',
+    topic: 'Event-based human pose and motion perception',
+  },
+  {
+    id: 'chiara-bartolozzi',
+    name: 'Chiara Bartolozzi',
+    affiliation: 'Italian Institute of Technology (IIT)',
+    topic: 'Event-driven perception for neuromorphic robots',
+  },
+  {
+    id: 'alper-yegenoglu',
     name: 'Alper Yegenoglu',
     affiliation: 'Paderborn University',
     topic: 'Spiking neural networks for embodied AI',
     photo: alperYegenogluPhoto,
   },
-  {
-    name: 'Zeyu Xiao',
-    affiliation: 'University of Trento',
-    topic: 'Event-based scene reasoning',
-    photo: zeyuXiaoPhoto,
-  },
-  {
-    name: 'Min Liu',
-    affiliation: 'DVSense',
-    topic: 'Event-based multimodal fusion for autonomous driving',
-    photo: minLiuPhoto,
-  },
-  {
-    name: 'Rongfei Nong',
-    affiliation: 'Forma AI',
-    topic: 'From event sensing to embodied world interaction',
-    photo: rongfeiNongPhoto,
-  },
 ];
+
+export const getSpeaker = (id: string): Speaker => {
+  const speaker = speakers.find((s) => s.id === id);
+  if (!speaker) throw new Error(`Unknown speaker: ${id}`);
+  return speaker;
+};
 
 export const topics = [
   {
-    title: 'Perception & navigation',
-    description: 'Event-based SLAM, visual odometry, agile navigation, and perception for autonomous driving.',
-    icon: 'tabler:scan',
+    title: 'Event-based state estimation',
+    description: 'Event-based SLAM, VO, and VIO for agile, low-latency, high-dynamic-range state estimation.',
+    icon: 'tabler:route',
   },
   {
-    title: 'Embodied intelligence',
-    description: 'Event foundation models, vision-language-action models, and spiking neural networks for robotics.',
+    title: 'Driving perception',
+    description: 'Time-to-contact, 3D detection, and fusion of events with RGB, LiDAR, and IMU for autonomous driving.',
+    icon: 'tabler:car',
+  },
+  {
+    title: 'Event foundation models',
+    description:
+      'Event foundation models and representation learning for detection, optical flow, depth, and scene understanding.',
     icon: 'tabler:brain',
   },
   {
-    title: 'Sensing & interaction',
-    description: 'Multimodal fusion, neuromorphic tactile sensing, manipulation, and deployment on real robots.',
-    icon: 'tabler:hand-finger',
+    title: 'Datasets and deployment',
+    description: 'Datasets, sim-to-real transfer, and how perception outputs best serve navigation and control.',
+    icon: 'tabler:database',
+  },
+];
+
+export interface Challenge {
+  title: string;
+  description: string;
+  leaderboard: string;
+}
+
+export const challenges: Challenge[] = [
+  {
+    title: 'EvSLAM',
+    description: 'How much do event cameras improve SLAM, VO, and VIO under high-speed 6-DoF motion?',
+    leaderboard: 'https://www.codabench.org/competitions/17239/',
+  },
+  {
+    title: 'eAP TTC',
+    description: 'Object time-to-contact estimation from synchronised RGB and event data in driving scenes.',
+    leaderboard: 'https://www.codabench.org/competitions/17291/',
+  },
+  {
+    title: 'eAP 3D Detection',
+    description:
+      'Event-enhanced 3D object detection with synchronised RGB, event, LiDAR, and GNSS-IMU data under challenging illumination and motion.',
+    leaderboard: 'https://www.codabench.org/competitions/17291/',
   },
 ];

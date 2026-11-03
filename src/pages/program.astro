@@ -1,68 +1,269 @@
 ---
 import Layout from '~/layouts/PageLayout.astro';
 import PageIntro from '~/components/workshop/PageIntro.astro';
+import { challenges, getSpeaker, speakers, type Speaker } from '~/data/workshop';
+import { getPermalink } from '~/utils/permalinks';
 
-const schedule = [
-  { time: '08:30', title: 'Opening remarks' },
-  { time: '08:45', title: 'Tutorial: event cameras for roboticists' },
-  { time: '09:15', title: 'Invited talks: event sensing and agile state estimation' },
-  { time: '10:15', title: 'Challenge introduction' },
-  { time: '10:30', title: 'Coffee break and posters', isBreak: true },
-  { time: '11:00', title: 'Invited talks: driving perception and multimodal fusion' },
-  { time: '12:00', title: 'Contributed oral presentations' },
-  { time: '12:30', title: 'Lunch', isBreak: true },
-  { time: '14:00', title: 'Invited talks: event foundation models, VLAs, and SNNs' },
-  { time: '15:00', title: 'Challenge results and winners’ presentations' },
-  { time: '15:30', title: 'Posters and robot/system demos (with coffee)', isBreak: true },
-  { time: '16:30', title: 'Invited talk: neuromorphic tactile sensing and manipulation' },
-  { time: '17:00', title: 'Panel discussion' },
-  { time: '17:45', title: 'Closing remarks and awards' },
-];
+type Item =
+  | { time: string; kind: 'talk'; number: number; speaker: Speaker }
+  | { time: string; kind: 'event'; title: string; description?: string };
 
-const challenges = [
-  { title: 'EvSLAM', description: 'SLAM, VO, and VIO under high-speed 6-DoF motion.' },
-  { title: 'eAP TTC', description: 'Object time-to-contact from synchronised RGB and event data in driving scenes.' },
+type Block =
+  | { kind: 'session'; label: string; title: string; description: string; items: Item[] }
+  | { kind: 'break'; time: string; title: string; description?: string };
+
+// Tentative schedule from the final proposal (Sec. 3).
+const blocks: Block[] = [
   {
-    title: 'eAP 3D Detection',
-    description: 'Event-enhanced 3D object detection with RGB, event, LiDAR, and GNSS-IMU data.',
+    kind: 'session',
+    label: 'Morning · Session 1',
+    title: 'Sensing and state estimation',
+    description: 'From the event camera itself to agile, low-latency state estimation.',
+    items: [
+      {
+        time: '08:30–08:40',
+        kind: 'event',
+        title: 'Opening remarks',
+        description: 'Welcome, workshop goals, and an overview of the day and the challenges.',
+      },
+      {
+        time: '08:40–09:10',
+        kind: 'event',
+        title: 'Tutorial: Event cameras for roboticists',
+        description:
+          'A short introduction to how event cameras work, common event representations, and where they help robots. Aimed at attendees with conventional perception or robot-learning backgrounds.',
+      },
+      { time: '09:10–09:40', kind: 'talk', number: 1, speaker: getSpeaker('hyunsurk-ryu') },
+      { time: '09:40–10:10', kind: 'talk', number: 2, speaker: getSpeaker('daniel-gehrig') },
+      {
+        time: '10:10–10:30',
+        kind: 'event',
+        title: 'Spotlight talks',
+        description: 'Short presentations of the highest-rated contributed papers.',
+      },
+    ],
+  },
+  {
+    kind: 'break',
+    time: '10:30–11:00',
+    title: 'Coffee and posters 1',
+    description: 'First poster session for accepted papers.',
+  },
+  {
+    kind: 'session',
+    label: 'Morning · Session 2',
+    title: 'Benchmarks, geometry, and driving',
+    description: 'The benchmark challenges, then geometric and driving perception with events.',
+    items: [
+      {
+        time: '11:00–11:30',
+        kind: 'event',
+        title: 'Challenge introduction',
+        description:
+          'The three benchmark challenges (EvSLAM, eAP TTC, and eAP 3D Detection): tasks, datasets, metrics, and baselines.',
+      },
+      { time: '11:30–12:00', kind: 'talk', number: 3, speaker: getSpeaker('guillermo-gallego') },
+      { time: '12:00–12:30', kind: 'talk', number: 4, speaker: getSpeaker('hoonhee-cho') },
+    ],
+  },
+  { kind: 'break', time: '12:30–14:00', title: 'Lunch' },
+  {
+    kind: 'session',
+    label: 'Afternoon · Session 3',
+    title: 'Human motion and neuromorphic robots',
+    description: 'Semantic perception of people in motion, through to embodied neuromorphic systems.',
+    items: [
+      { time: '14:00–14:30', kind: 'talk', number: 5, speaker: getSpeaker('gaurvi-goyal') },
+      { time: '14:30–15:00', kind: 'talk', number: 6, speaker: getSpeaker('chiara-bartolozzi') },
+      { time: '15:00–15:30', kind: 'talk', number: 7, speaker: getSpeaker('alper-yegenoglu') },
+    ],
+  },
+  {
+    kind: 'break',
+    time: '15:30–16:30',
+    title: 'Coffee, posters, and robot demos 2',
+    description: 'Second poster session, with live and video robot and system demos.',
+  },
+  {
+    kind: 'session',
+    label: 'Afternoon · Session 4',
+    title: 'Challenges and discussion',
+    description: 'Challenge results, a panel with all invited speakers, and awards.',
+    items: [
+      {
+        time: '16:30–17:00',
+        kind: 'event',
+        title: 'Challenge results and winners’ talks',
+        description: 'Final leaderboards for all three challenges, with presentations from the top teams.',
+      },
+      {
+        time: '17:00–17:50',
+        kind: 'event',
+        title: 'Panel discussion',
+        description: 'All seven invited speakers, with questions from the audience collected live and in advance.',
+      },
+      { time: '17:50–18:00', kind: 'event', title: 'Closing remarks and awards' },
+    ],
   },
 ];
+
+const format = [
+  { value: String(speakers.length), label: 'Invited talks', detail: '25 min + 5 min Q&A' },
+  { value: '1', label: 'Tutorial', detail: 'Event cameras for roboticists' },
+  { value: String(challenges.length), label: 'Benchmark challenges', detail: 'Public Codabench leaderboards' },
+  { value: '2', label: 'Poster sessions', detail: 'Up to 30 contributions' },
+  { value: '3–4', label: 'Demo tables', detail: 'Live and video demos in the afternoon' },
+  { value: '1', label: 'Panel', detail: 'All invited speakers' },
+];
+
+const panelQuestions = [
+  'What should an event foundation model for robotics look like?',
+  'Which perception tasks benefit most from events?',
+  'When do event cameras truly enable real-time operation and beat frames or LiDAR?',
+  'How should datasets be designed to reveal sensor advantages?',
+];
+
+const speakerHref = (id: string) => `${getPermalink('/speakers')}#${id}`;
+const linkClass = 'text-primary underline underline-offset-4 dark:text-blue-300';
 ---
 
 <Layout metadata={{ title: 'Program', description: 'The tentative schedule for the EVRI workshop at ICRA 2027.' }}>
   <PageIntro
     title="Program"
-    description="A full day following the sensing → perception → reasoning → action loop, from event cameras to embodied intelligence."
+    description="A full day that follows the path from the event camera, through geometric perception (SLAM, stereo, motion) and semantic perception (driving, human motion), to embodied neuromorphic systems."
   />
-  <div class="mx-auto max-w-4xl space-y-14 px-4 pb-16 sm:px-6 md:pb-24">
-    <section aria-labelledby="schedule-title">
-      <h2 id="schedule-title" class="mb-2 text-2xl font-bold text-heading">Tentative schedule</h2>
-      <p class="mb-6 text-sm text-muted">Times are provisional. Date and room to be announced.</p>
-      <ol class="divide-y divide-slate-200 dark:divide-slate-800">
+  <div class="mx-auto max-w-4xl space-y-16 px-4 pb-16 sm:px-6 md:pb-24">
+    <section aria-labelledby="format-title">
+      <h2 id="format-title" class="mb-6 text-2xl font-bold text-heading">At a glance</h2>
+      <dl class="grid grid-cols-2 gap-4 md:grid-cols-3">
         {
-          schedule.map(({ time, title, isBreak }) => (
-            <li class="flex gap-6 py-3">
-              <span class="w-12 shrink-0 font-medium tabular-nums text-muted">{time}</span>
-              <span class={isBreak ? 'italic text-muted' : 'text-heading'}>{title}</span>
-            </li>
+          format.map(({ value, label, detail }) => (
+            <div class="rounded-xl border border-slate-200 p-4 dark:border-slate-700">
+              <dt class="text-sm font-medium text-heading">{label}</dt>
+              <dd class="mt-1 text-3xl font-bold tabular-nums text-primary dark:text-blue-300">{value}</dd>
+              <dd class="mt-1 text-sm text-muted">{detail}</dd>
+            </div>
           ))
         }
-      </ol>
+      </dl>
     </section>
-    <section aria-labelledby="challenges-title">
-      <h2 id="challenges-title" class="mb-4 text-2xl font-bold text-heading">Challenges</h2>
-      <ul class="mb-4 space-y-3">
+
+    <section aria-labelledby="schedule-title">
+      <h2 id="schedule-title" class="mb-2 text-2xl font-bold text-heading">Tentative schedule</h2>
+      <p class="mb-8 text-sm text-muted">
+        Times and talk titles are provisional. Date and room to be announced. All times are local (Seoul, KST).
+      </p>
+      <div class="space-y-10">
         {
-          challenges.map(({ title, description }) => (
-            <li class="leading-relaxed text-muted">
-              <span class="font-semibold text-heading">{title}</span> — {description}
+          blocks.map((block) =>
+            block.kind === 'break' ? (
+              <div class="flex flex-col gap-1 rounded-xl bg-slate-100 px-4 py-3 sm:flex-row sm:gap-6 dark:bg-slate-800">
+                <span class="w-28 shrink-0 pt-0.5 text-sm font-medium tabular-nums text-muted">{block.time}</span>
+                <div>
+                  <p class="font-semibold italic text-heading">{block.title}</p>
+                  {block.description && <p class="mt-1 text-sm leading-relaxed text-muted">{block.description}</p>}
+                </div>
+              </div>
+            ) : (
+              <section aria-label={`${block.label}: ${block.title}`}>
+                <div class="mb-3 border-l-4 border-primary pl-4 dark:border-blue-300">
+                  <p class="text-xs font-bold uppercase tracking-widest text-primary dark:text-blue-300">
+                    {block.label}
+                  </p>
+                  <h3 class="text-xl font-bold text-heading">{block.title}</h3>
+                  <p class="mt-1 text-sm text-muted">{block.description}</p>
+                </div>
+                <ol class="divide-y divide-slate-200 dark:divide-slate-800">
+                  {block.items.map((item) => (
+                    <li class="flex flex-col gap-1 py-4 sm:flex-row sm:gap-6">
+                      <span class="w-28 shrink-0 pt-0.5 text-sm font-medium tabular-nums text-muted">{item.time}</span>
+                      {item.kind === 'talk' ? (
+                        <div>
+                          <p class="text-xs font-semibold uppercase tracking-wide text-muted">
+                            Invited talk {item.number}
+                          </p>
+                          <p class="font-semibold text-heading">
+                            <a href={speakerHref(item.speaker.id)} class="hover:underline hover:underline-offset-4">
+                              {item.speaker.name}
+                            </a>
+                            <span class="font-normal text-muted"> · {item.speaker.affiliation}</span>
+                          </p>
+                          {item.speaker.talkTitle ? (
+                            <p class="mt-1 leading-relaxed">{item.speaker.talkTitle}</p>
+                          ) : (
+                            <p class="mt-1 leading-relaxed text-muted">
+                              <span class="italic">Title to be announced</span> · {item.speaker.topic}
+                            </p>
+                          )}
+                        </div>
+                      ) : (
+                        <div>
+                          <p class="font-semibold text-heading">{item.title}</p>
+                          {item.description && <p class="mt-1 leading-relaxed text-muted">{item.description}</p>}
+                        </div>
+                      )}
+                    </li>
+                  ))}
+                </ol>
+              </section>
+            )
+          )
+        }
+      </div>
+    </section>
+
+    <section aria-labelledby="contributions-title">
+      <h2 id="contributions-title" class="mb-4 text-2xl font-bold text-heading">Contributed papers and demos</h2>
+      <p class="leading-relaxed text-muted">
+        Accepted short papers are presented as posters across the two poster sessions, which run during the coffee
+        breaks. The highest-rated papers are also given spotlight talks in the morning. The afternoon session adds live
+        and video robot and system demos, leaving time to discuss failure modes, hardware–software co-design, and
+        deployment. See the <a href={getPermalink('/call-for-papers')} class={linkClass}>call for papers</a> for submission
+        details.
+      </p>
+    </section>
+
+    <section aria-labelledby="challenges-title">
+      <h2 id="challenges-title" class="mb-4 text-2xl font-bold text-heading">Benchmark challenges</h2>
+      <p class="mb-6 leading-relaxed text-muted">
+        Three challenges benchmark event-based perception on large-scale robotic systems. Datasets, metrics, and
+        baseline code will be released ahead of time. Submissions are evaluated on public Codabench leaderboards and
+        accompanied by a short technical report. Challenges are introduced in the morning, and the top teams present
+        their methods in the afternoon.
+      </p>
+      <ul class="grid gap-4 md:grid-cols-3">
+        {
+          challenges.map(({ title, description, leaderboard }) => (
+            <li class="flex flex-col rounded-xl border border-slate-200 p-5 dark:border-slate-700">
+              <h3 class="font-bold text-heading">{title}</h3>
+              <p class="mt-2 flex-1 text-sm leading-relaxed text-muted">{description}</p>
+              <a href={leaderboard} class={`mt-4 text-sm font-medium ${linkClass}`}>
+                Leaderboard <span aria-hidden="true">↗</span>
+              </a>
             </li>
           ))
         }
       </ul>
+    </section>
+
+    <section aria-labelledby="panel-title">
+      <h2 id="panel-title" class="mb-4 text-2xl font-bold text-heading">Panel discussion</h2>
+      <p class="mb-4 leading-relaxed text-muted">
+        All seven <a href={getPermalink('/speakers')} class={linkClass}>invited speakers</a> form the panel, bringing together
+        event vision, robotics, autonomous driving, and industry. Audience questions are collected live and in advance. Questions
+        include:
+      </p>
+      <ul class="list-disc space-y-2 pl-5 text-muted">
+        {panelQuestions.map((q) => <li class="pl-1 leading-relaxed">{q}</li>)}
+      </ul>
+    </section>
+
+    <section aria-labelledby="after-title">
+      <h2 id="after-title" class="mb-4 text-2xl font-bold text-heading">Remote access and materials</h2>
       <p class="leading-relaxed text-muted">
-        Datasets, metrics, and baselines will be released ahead of time, with a public leaderboard. Top teams present at
-        the workshop.
+        Where possible, recorded talks and remote posters will support those unable to travel. After the workshop,
+        slides, recorded talks (with speaker consent), accepted papers, and challenge results will be published on this
+        site. Challenge datasets, evaluation code, baselines, and leaderboards will stay public as a lasting benchmark.
       </p>
     </section>
   </div>

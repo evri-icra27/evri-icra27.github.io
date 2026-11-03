@@ -1,6 +1,6 @@
 # EVRI · ICRA 2027
 
-Website for the proposed workshop **Event-Based Vision for Real-World Robotics: From Perception to Embodied Intelligence**. Built with AstroWind, Astro, and Tailwind CSS.
+Website for the proposed workshop **Event-Based Vision for Real-World Robotics: From Perception to Scene Understanding**. Built with AstroWind, Astro, and Tailwind CSS.
 
 The initial content follows the workshop proposal. Acceptance, the workshop date, speakers, and submission arrangements are still to be confirmed.
 

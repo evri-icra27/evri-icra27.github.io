@@ -42,32 +42,37 @@ const structuredData = {
 
   <section class="border-y border-slate-200 bg-slate-50 py-12 dark:border-slate-800 dark:bg-slate-900/50">
     <div class="mx-auto max-w-4xl px-4 sm:px-6">
-      <h2 class="mb-5 text-2xl font-bold text-heading md:text-3xl">From event streams to robot action</h2>
+      <h2 class="mb-5 text-2xl font-bold text-heading md:text-3xl">
+        Can event streams become a first-class modality for robots?
+      </h2>
       <p class="text-lg leading-relaxed text-muted">
-        How can event-based vision help robots perceive, reason, and act in the real world? This proposed workshop
-        brings together researchers in robotics, computer vision, neuromorphic computing, and embodied AI to explore
-        that question—from agile state estimation and autonomous driving to learning and manipulation.
+        Event cameras report per-pixel brightness changes asynchronously, with microsecond latency, high dynamic range,
+        and sparse output—exactly what robots need under fast motion, drastic illumination changes, and tight control
+        loops. Yet their impact on large-scale systems such as SLAM and driving perception has not been benchmarked
+        systematically, and the foundation models now reshaping robotic perception remain almost exclusively
+        frame-based.
       </p>
       <p class="mt-4 text-lg leading-relaxed text-muted">
-        We are planning a day of tutorials, invited talks, contributed research, benchmark challenges, and robot
-        demonstrations, with space for discussion across these communities.
+        This proposed full-day workshop brings together event vision, robotics, and autonomous driving with a tutorial,
+        seven invited talks, three benchmark challenges, contributed papers, robot demos, and a panel discussion.
       </p>
     </div>
   </section>
 
   <Features
     title="Workshop themes"
-    subtitle="Connecting sensing, perception, reasoning, and action."
+    subtitle="From event-based perception to scene understanding."
     items={topics}
-    columns={3}
+    columns={2}
   />
 
   <section class="mx-auto max-w-4xl px-4 pb-16 sm:px-6 md:pb-24">
     <div class="rounded-2xl border border-slate-200 p-6 md:p-10 dark:border-slate-700">
       <h2 class="mb-3 text-2xl font-bold text-heading">Help shape the discussion</h2>
       <p class="mb-6 leading-relaxed text-muted">
-        We plan to welcome short papers and demo contributions across the workshop themes. Submission instructions and
-        important dates will be announced once the workshop is confirmed.
+        We plan to welcome short papers and demo contributions across the workshop themes, and to run three public
+        benchmark challenges. Submission instructions and important dates will be announced once the workshop is
+        confirmed.
       </p>
       <div class="flex flex-wrap gap-4">
         <Button href={getPermalink('/call-for-papers')} variant="primary">Contribution details</Button>
