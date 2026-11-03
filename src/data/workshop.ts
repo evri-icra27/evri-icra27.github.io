@@ -23,6 +23,8 @@ import danielGehrigPhoto from '~/assets/images/speakers/daniel-gehrig.jpg';
 import hoonheeChoPhoto from '~/assets/images/speakers/hoonhee-cho.jpg';
 import guillermoGallegoPhoto from '~/assets/images/speakers/guillermo-gallego.jpg';
 import alperYegenogluPhoto from '~/assets/images/speakers/alper-yegenoglu.jpg';
+import gaurviGoyalPhoto from '~/assets/images/speakers/gaurvi-goyal.jpg';
+import chiaraBartolozziPhoto from '~/assets/images/speakers/chiara-bartolozzi.jpg';
 
 export const workshop = {
   title: 'Event-Based Vision for Real-World Robotics',
@@ -159,12 +161,14 @@ export const speakers: Speaker[] = [
     name: 'Gaurvi Goyal',
     affiliation: 'Maastricht University',
     topic: 'Event-based human pose and motion perception',
+    photo: gaurviGoyalPhoto,
   },
   {
     id: 'chiara-bartolozzi',
     name: 'Chiara Bartolozzi',
     affiliation: 'Italian Institute of Technology (IIT)',
     topic: 'Event-driven perception for neuromorphic robots',
+    photo: chiaraBartolozziPhoto,
   },
   {
     id: 'alper-yegenoglu',
@@ -229,3 +233,11 @@ export const challenges: Challenge[] = [
     leaderboard: 'https://www.codabench.org/competitions/17291/',
   },
 ];
+
+/** Initials for photo placeholders, ignoring parenthesised nicknames. */
+export const initials = (name: string) =>
+  name
+    .replace(/\s*\(.*?\)/, '')
+    .split(' ')
+    .map((part) => part[0])
+    .join('');

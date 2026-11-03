@@ -1,16 +1,18 @@
 ---
 import Layout from '~/layouts/PageLayout.astro';
 import PageIntro from '~/components/workshop/PageIntro.astro';
-import { challenges, getSpeaker, speakers, type Speaker } from '~/data/workshop';
+import { Icon } from 'astro-icon/components';
+import Image from '~/components/common/Image.astro';
+import { challenges, getSpeaker, initials, type Speaker } from '~/data/workshop';
 import { getPermalink } from '~/utils/permalinks';
 
 type Item =
   | { time: string; kind: 'talk'; number: number; speaker: Speaker }
-  | { time: string; kind: 'event'; title: string; description?: string };
+  | { time: string; kind: 'event'; title: string; short: string; description?: string };
 
 type Block =
   | { kind: 'session'; label: string; title: string; description: string; items: Item[] }
-  | { kind: 'break'; time: string; title: string; description?: string };
+  | { kind: 'break'; time: string; title: string; short: string; description?: string };
 
 // Tentative schedule from the final proposal (Sec. 3).
 const blocks: Block[] = [
@@ -24,12 +26,14 @@ const blocks: Block[] = [
         time: '08:30–08:40',
         kind: 'event',
         title: 'Opening remarks',
+        short: 'Opening',
         description: 'Welcome, workshop goals, and an overview of the day and the challenges.',
       },
       {
         time: '08:40–09:10',
         kind: 'event',
         title: 'Tutorial: Event cameras for roboticists',
+        short: 'Tutorial',
         description:
           'A short introduction to how event cameras work, common event representations, and where they help robots. Aimed at attendees with conventional perception or robot-learning backgrounds.',
       },
@@ -39,6 +43,7 @@ const blocks: Block[] = [
         time: '10:10–10:30',
         kind: 'event',
         title: 'Spotlight talks',
+        short: 'Spotlight talks',
         description: 'Short presentations of the highest-rated contributed papers.',
       },
     ],
@@ -47,6 +52,7 @@ const blocks: Block[] = [
     kind: 'break',
     time: '10:30–11:00',
     title: 'Coffee and posters 1',
+    short: 'Coffee & posters 1',
     description: 'First poster session for accepted papers.',
   },
   {
@@ -59,6 +65,7 @@ const blocks: Block[] = [
         time: '11:00–11:30',
         kind: 'event',
         title: 'Challenge introduction',
+        short: 'Challenge intro',
         description:
           'The three benchmark challenges (EvSLAM, eAP TTC, and eAP 3D Detection): tasks, datasets, metrics, and baselines.',
       },
@@ -66,7 +73,7 @@ const blocks: Block[] = [
       { time: '12:00–12:30', kind: 'talk', number: 4, speaker: getSpeaker('hoonhee-cho') },
     ],
   },
-  { kind: 'break', time: '12:30–14:00', title: 'Lunch' },
+  { kind: 'break', time: '12:30–14:00', title: 'Lunch', short: 'Lunch' },
   {
     kind: 'session',
     label: 'Afternoon · Session 3',
@@ -82,6 +89,7 @@ const blocks: Block[] = [
     kind: 'break',
     time: '15:30–16:30',
     title: 'Coffee, posters, and robot demos 2',
+    short: 'Coffee, posters & demos 2',
     description: 'Second poster session, with live and video robot and system demos.',
   },
   {
@@ -94,27 +102,82 @@ const blocks: Block[] = [
         time: '16:30–17:00',
         kind: 'event',
         title: 'Challenge results and winners’ talks',
+        short: 'Challenge results',
         description: 'Final leaderboards for all three challenges, with presentations from the top teams.',
       },
       {
         time: '17:00–17:50',
         kind: 'event',
         title: 'Panel discussion',
+        short: 'Panel discussion',
         description: 'All seven invited speakers, with questions from the audience collected live and in advance.',
       },
-      { time: '17:50–18:00', kind: 'event', title: 'Closing remarks and awards' },
+      { time: '17:50–18:00', kind: 'event', title: 'Closing remarks and awards', short: 'Closing & awards' },
     ],
   },
 ];
 
-const format = [
-  { value: String(speakers.length), label: 'Invited talks', detail: '25 min + 5 min Q&A' },
-  { value: '1', label: 'Tutorial', detail: 'Event cameras for roboticists' },
-  { value: String(challenges.length), label: 'Benchmark challenges', detail: 'Public Codabench leaderboards' },
-  { value: '2', label: 'Poster sessions', detail: 'Up to 30 contributions' },
-  { value: '3–4', label: 'Demo tables', detail: 'Live and video demos in the afternoon' },
-  { value: '1', label: 'Panel', detail: 'All invited speakers' },
+// Calendar overview: two equal four-hour halves either side of lunch.
+const toMinutes = (t: string) => {
+  const [h, m] = t.split(':').map(Number);
+  return h * 60 + m;
+};
+const span = (time: string) => {
+  const [start, end] = time.split('–');
+  return { start: toMinutes(start), end: toMinutes(end) };
+};
+const surname = (s: Speaker) => `${s.name[0]}. ${s.name.split(' ').at(-1)}`;
+const slotId = (time: string) => `slot-${time.slice(0, 5).replace(':', '')}`;
+
+type Category = 'talk' | 'event' | 'break';
+const calendarEntries = blocks.flatMap((block) =>
+  block.kind === 'break'
+    ? [{ time: block.time, label: block.short, category: 'break' as Category }]
+    : block.items.map((item) =>
+        item.kind === 'talk'
+          ? { time: item.time, label: `Talk ${item.number} · ${surname(item.speaker)}`, category: 'talk' as Category }
+          : { time: item.time, label: item.short, category: 'event' as Category }
+      )
+);
+
+const PX_PER_MIN = 2.4;
+const halves = [
+  { label: 'Morning', from: '08:30', to: '12:30' },
+  { label: 'Afternoon', from: '14:00', to: '18:00' },
+].map(({ label, from, to }) => {
+  const start = toMinutes(from);
+  const end = toMinutes(to);
+  const hours = [];
+  for (let h = Math.ceil(start / 60) * 60; h <= end; h += 60) hours.push(h);
+  return {
+    label,
+    range: `${from}–${to}`,
+    height: (end - start) * PX_PER_MIN,
+    hours: hours.map((h) => ({ top: (h - start) * PX_PER_MIN, text: `${String(h / 60).padStart(2, '0')}:00` })),
+    entries: calendarEntries
+      .map((entry) => ({ ...entry, ...span(entry.time) }))
+      .filter((entry) => entry.start >= start && entry.end <= end)
+      .map((entry) => ({
+        ...entry,
+        top: (entry.start - start) * PX_PER_MIN,
+        height: (entry.end - entry.start) * PX_PER_MIN,
+      })),
+  };
+});
+
+const categoryStyles: Record<Category, string> = {
+  talk: 'border-primary bg-primary/10 text-heading hover:bg-primary/20 dark:bg-primary/25 dark:hover:bg-primary/35',
+  event: 'border-accent bg-accent/10 text-heading hover:bg-accent/20 dark:bg-accent/25 dark:hover:bg-accent/35',
+  break:
+    'border-slate-300 bg-slate-100 text-muted hover:bg-slate-200 dark:border-slate-600 dark:bg-slate-800 dark:hover:bg-slate-700',
+};
+const legend: { category: Category; label: string }[] = [
+  { category: 'talk', label: 'Invited talk' },
+  { category: 'event', label: 'Program item' },
+  { category: 'break', label: 'Break, posters & demos' },
 ];
+
+const sessionRange = (items: Item[]) => `${items[0].time.split('–')[0]}–${items.at(-1)!.time.split('–')[1]}`;
 
 const panelQuestions = [
   'What should an event foundation model for robotics look like?',
@@ -133,77 +196,174 @@ const linkClass = 'text-primary underline underline-offset-4 dark:text-blue-300'
     description="A full day that follows the path from the event camera, through geometric perception (SLAM, stereo, motion) and semantic perception (driving, human motion), to embodied neuromorphic systems."
   />
   <div class="mx-auto max-w-4xl space-y-16 px-4 pb-16 sm:px-6 md:pb-24">
-    <section aria-labelledby="format-title">
-      <h2 id="format-title" class="mb-6 text-2xl font-bold text-heading">At a glance</h2>
-      <dl class="grid grid-cols-2 gap-4 md:grid-cols-3">
+    <section aria-labelledby="overview-title">
+      <h2 id="overview-title" class="mb-2 text-2xl font-bold text-heading">The day at a glance</h2>
+      <p class="mb-4 text-sm text-muted">
+        Times and talk titles are provisional. Date and room to be announced. All times are local (Seoul, KST).
+      </p>
+      <ul class="mb-6 flex flex-wrap gap-x-5 gap-y-2 text-sm text-muted">
         {
-          format.map(({ value, label, detail }) => (
-            <div class="rounded-xl border border-slate-200 p-4 dark:border-slate-700">
-              <dt class="text-sm font-medium text-heading">{label}</dt>
-              <dd class="mt-1 text-3xl font-bold tabular-nums text-primary dark:text-blue-300">{value}</dd>
-              <dd class="mt-1 text-sm text-muted">{detail}</dd>
+          legend.map(({ category, label }) => (
+            <li class="flex items-center gap-2">
+              <span class:list={['h-3 w-5 rounded-sm border-l-4', categoryStyles[category]]} aria-hidden="true" />
+              {label}
+            </li>
+          ))
+        }
+      </ul>
+      <div class="grid gap-8 md:grid-cols-2">
+        {
+          halves.map((half) => (
+            <div>
+              <h3 class="mb-3 flex items-baseline justify-between text-sm">
+                <span class="font-bold uppercase tracking-widest text-heading">{half.label}</span>
+                <span class="tabular-nums text-muted">{half.range}</span>
+              </h3>
+              <div class="flex">
+                <div class="relative w-12 shrink-0" style={`height: ${half.height}px`} aria-hidden="true">
+                  {half.hours.map(({ top, text }) => (
+                    <span class="absolute -translate-y-1/2 text-xs tabular-nums text-muted" style={`top: ${top}px`}>
+                      {text}
+                    </span>
+                  ))}
+                </div>
+                <ol
+                  class="relative flex-1 border-l border-slate-200 dark:border-slate-700"
+                  style={`height: ${half.height}px`}
+                >
+                  {half.hours.map(({ top }) => (
+                    <li
+                      aria-hidden="true"
+                      class="absolute inset-x-0 border-t border-dashed border-slate-200 dark:border-slate-800"
+                      style={`top: ${top}px`}
+                    />
+                  ))}
+                  {half.entries.map((entry) => (
+                    <li class="absolute inset-x-1" style={`top: ${entry.top + 1}px; height: ${entry.height - 2}px`}>
+                      <a
+                        href={`#${slotId(entry.time)}`}
+                        class:list={[
+                          'flex h-full overflow-hidden rounded-md border-l-4 px-2 text-xs leading-tight transition-colors',
+                          entry.height >= 48
+                            ? 'flex-col justify-center gap-0.5 py-1'
+                            : 'items-center justify-between gap-2',
+                          categoryStyles[entry.category],
+                        ]}
+                      >
+                        <span class="truncate font-semibold">{entry.label}</span>
+                        <span class="shrink-0 tabular-nums opacity-75">{entry.time}</span>
+                      </a>
+                    </li>
+                  ))}
+                </ol>
+              </div>
             </div>
           ))
         }
-      </dl>
+      </div>
+      <p class="mt-4 text-center text-sm text-muted">Lunch 12:30–14:00</p>
     </section>
 
     <section aria-labelledby="schedule-title">
-      <h2 id="schedule-title" class="mb-2 text-2xl font-bold text-heading">Tentative schedule</h2>
-      <p class="mb-8 text-sm text-muted">
-        Times and talk titles are provisional. Date and room to be announced. All times are local (Seoul, KST).
-      </p>
-      <div class="space-y-10">
+      <h2 id="schedule-title" class="mb-8 text-2xl font-bold text-heading">Detailed schedule</h2>
+      <div class="space-y-6">
         {
           blocks.map((block) =>
             block.kind === 'break' ? (
-              <div class="flex flex-col gap-1 rounded-xl bg-slate-100 px-4 py-3 sm:flex-row sm:gap-6 dark:bg-slate-800">
-                <span class="w-28 shrink-0 pt-0.5 text-sm font-medium tabular-nums text-muted">{block.time}</span>
-                <div>
-                  <p class="font-semibold italic text-heading">{block.title}</p>
-                  {block.description && <p class="mt-1 text-sm leading-relaxed text-muted">{block.description}</p>}
+              <div
+                id={slotId(block.time)}
+                class="flex scroll-mt-24 items-start gap-4 rounded-xl border border-dashed border-slate-300 px-5 py-3 dark:border-slate-700"
+              >
+                <Icon
+                  name={block.short === 'Lunch' ? 'tabler:tools-kitchen-2' : 'tabler:coffee'}
+                  class="mt-0.5 h-5 w-5 shrink-0 text-muted"
+                />
+                <div class="flex flex-1 flex-col gap-1 sm:flex-row sm:gap-6">
+                  <span class="w-24 shrink-0 text-sm font-medium tabular-nums text-muted">{block.time}</span>
+                  <div>
+                    <p class="font-medium text-heading">{block.title}</p>
+                    {block.description && <p class="mt-0.5 text-sm leading-relaxed text-muted">{block.description}</p>}
+                  </div>
                 </div>
               </div>
             ) : (
-              <section aria-label={`${block.label}: ${block.title}`}>
-                <div class="mb-3 border-l-4 border-primary pl-4 dark:border-blue-300">
-                  <p class="text-xs font-bold uppercase tracking-widest text-primary dark:text-blue-300">
-                    {block.label}
-                  </p>
-                  <h3 class="text-xl font-bold text-heading">{block.title}</h3>
-                  <p class="mt-1 text-sm text-muted">{block.description}</p>
-                </div>
+              <section
+                class="overflow-hidden rounded-2xl border border-slate-200 dark:border-slate-700"
+                aria-label={`${block.label}: ${block.title}`}
+              >
+                <header class="flex flex-col gap-2 border-b border-slate-200 bg-slate-50 px-5 py-4 sm:flex-row sm:items-start sm:justify-between dark:border-slate-700 dark:bg-slate-900/60">
+                  <div>
+                    <p class="text-xs font-bold uppercase tracking-widest text-primary dark:text-blue-300">
+                      {block.label}
+                    </p>
+                    <h3 class="mt-1 text-xl font-bold text-heading">{block.title}</h3>
+                    <p class="mt-1 text-sm text-muted">{block.description}</p>
+                  </div>
+                  <span class="shrink-0 text-sm font-medium tabular-nums text-muted">{sessionRange(block.items)}</span>
+                </header>
                 <ol class="divide-y divide-slate-200 dark:divide-slate-800">
-                  {block.items.map((item) => (
-                    <li class="flex flex-col gap-1 py-4 sm:flex-row sm:gap-6">
-                      <span class="w-28 shrink-0 pt-0.5 text-sm font-medium tabular-nums text-muted">{item.time}</span>
-                      {item.kind === 'talk' ? (
-                        <div>
-                          <p class="text-xs font-semibold uppercase tracking-wide text-muted">
-                            Invited talk {item.number}
-                          </p>
-                          <p class="font-semibold text-heading">
-                            <a href={speakerHref(item.speaker.id)} class="hover:underline hover:underline-offset-4">
-                              {item.speaker.name}
-                            </a>
-                            <span class="font-normal text-muted"> · {item.speaker.affiliation}</span>
-                          </p>
-                          {item.speaker.talkTitle ? (
-                            <p class="mt-1 leading-relaxed">{item.speaker.talkTitle}</p>
+                  {block.items.map((item) =>
+                    item.kind === 'talk' ? (
+                      <li
+                        id={slotId(item.time)}
+                        class="flex scroll-mt-24 flex-col gap-2 border-l-4 border-primary bg-primary/5 px-5 py-4 sm:flex-row sm:gap-6 dark:bg-primary/10"
+                      >
+                        <span class="w-24 shrink-0 pt-0.5 text-sm font-medium tabular-nums text-muted">
+                          {item.time}
+                        </span>
+                        <div class="flex items-start gap-4">
+                          {item.speaker.photo ? (
+                            <Image
+                              src={item.speaker.photo}
+                              alt=""
+                              width={48}
+                              height={48}
+                              layout="fixed"
+                              class="h-12 w-12 shrink-0 rounded-full object-cover ring-1 ring-slate-200 dark:ring-slate-700"
+                            />
                           ) : (
-                            <p class="mt-1 leading-relaxed text-muted">
-                              <span class="italic">Title to be announced</span> · {item.speaker.topic}
-                            </p>
+                            <span
+                              aria-hidden="true"
+                              class="flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-slate-200 text-sm font-semibold text-slate-600 dark:bg-slate-700 dark:text-slate-200"
+                            >
+                              {initials(item.speaker.name)}
+                            </span>
                           )}
+                          <div>
+                            <p class="text-xs font-bold uppercase tracking-wide text-primary dark:text-blue-300">
+                              Invited talk {item.number}
+                            </p>
+                            <p class="mt-0.5 text-lg font-semibold text-heading">
+                              <a href={speakerHref(item.speaker.id)} class="hover:underline hover:underline-offset-4">
+                                {item.speaker.name}
+                              </a>
+                            </p>
+                            <p class="text-sm text-muted">{item.speaker.affiliation}</p>
+                            {item.speaker.talkTitle ? (
+                              <p class="mt-2 leading-relaxed text-heading">{item.speaker.talkTitle}</p>
+                            ) : (
+                              <p class="mt-2 leading-relaxed">
+                                <span class="text-muted italic">Title to be announced ·</span> {item.speaker.topic}
+                              </p>
+                            )}
+                          </div>
                         </div>
-                      ) : (
+                      </li>
+                    ) : (
+                      <li
+                        id={slotId(item.time)}
+                        class="flex scroll-mt-24 flex-col gap-1 border-l-4 border-transparent px-5 py-4 sm:flex-row sm:gap-6"
+                      >
+                        <span class="w-24 shrink-0 pt-0.5 text-sm font-medium tabular-nums text-muted">
+                          {item.time}
+                        </span>
                         <div>
                           <p class="font-semibold text-heading">{item.title}</p>
                           {item.description && <p class="mt-1 leading-relaxed text-muted">{item.description}</p>}
                         </div>
-                      )}
-                    </li>
-                  ))}
+                      </li>
+                    )
+                  )}
                 </ol>
               </section>
             )
