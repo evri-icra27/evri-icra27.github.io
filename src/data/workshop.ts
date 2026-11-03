@@ -33,6 +33,10 @@ export const workshop = {
   location: 'Seoul, South Korea',
   status: 'Proposed workshop',
   contact: 'andreas.ziegler@robotics.utias.utoronto.ca',
+  /** Workshop day as "YYYY-MM-DD". Set once confirmed: this turns on "Add to calendar" on the program page. */
+  date: undefined as string | undefined,
+  /** Seoul (KST) is UTC+9 all year. */
+  utcOffsetHours: 9,
 };
 
 export interface Organiser {

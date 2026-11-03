@@ -4,6 +4,7 @@ import PageIntro from '~/components/workshop/PageIntro.astro';
 import Image from '~/components/common/Image.astro';
 import { initials, speakers } from '~/data/workshop';
 import { getPermalink } from '~/utils/permalinks';
+import { slotId, talkFor } from '~/data/program';
 ---
 
 <Layout
@@ -18,37 +19,49 @@ import { getPermalink } from '~/utils/permalinks';
   />
   <section class="mx-auto max-w-6xl px-4 pb-16 sm:px-6 md:pb-24" aria-labelledby="speakers-title">
     <h2 id="speakers-title" class="mb-10 text-2xl font-bold text-heading">Confirmed speakers</h2>
-    <ul class="grid gap-x-8 gap-y-12 sm:grid-cols-2 lg:grid-cols-3">
+    <ul class="grid gap-x-4 gap-y-8 sm:grid-cols-2 lg:grid-cols-3">
       {
-        speakers.map(({ id, name, affiliation, topic, talkTitle, photo }, index) => (
-          <li id={id} class="scroll-mt-24 text-center">
-            {photo ? (
-              <Image
-                src={photo}
-                alt={`Portrait of ${name}`}
-                width={144}
-                height={144}
-                layout="fixed"
-                class="mx-auto h-36 w-36 rounded-full object-cover ring-1 ring-slate-200 dark:ring-slate-700"
-              />
-            ) : (
-              <div class="mx-auto flex h-36 w-36 items-center justify-center rounded-full bg-slate-100 dark:bg-slate-800">
-                <span aria-hidden="true" class="text-3xl font-semibold text-slate-500 dark:text-slate-300">
-                  {initials(name)}
-                </span>
-              </div>
-            )}
-            <h3 class="mt-5 text-lg font-bold text-heading">{name}</h3>
-            <p class="mt-1 text-sm text-muted">{affiliation}</p>
-            <p class="mt-2 leading-relaxed">{talkTitle ?? topic}</p>
-            <a
-              href={getPermalink('/program')}
-              class="mt-2 inline-block text-sm text-primary underline underline-offset-4 dark:text-blue-300"
-            >
-              Invited talk {index + 1}
-            </a>
-          </li>
-        ))
+        speakers.map(({ id, name, affiliation, topic, talkTitle, photo }) => {
+          const talk = talkFor(id);
+          return (
+            <li id={id} class="scroll-mt-24 text-center">
+              <a
+                href={talk ? `${getPermalink('/program')}#${slotId(talk.time)}` : getPermalink('/program')}
+                class="group block rounded-2xl p-4 transition-colors hover:bg-slate-50 dark:hover:bg-slate-900/60"
+              >
+                {photo ? (
+                  <Image
+                    src={photo}
+                    alt=""
+                    width={144}
+                    height={144}
+                    layout="fixed"
+                    class="mx-auto h-36 w-36 rounded-full object-cover ring-1 ring-slate-200 transition group-hover:ring-4 group-hover:ring-primary dark:ring-slate-700 dark:group-hover:ring-blue-300"
+                  />
+                ) : (
+                  <div class="mx-auto flex h-36 w-36 items-center justify-center rounded-full bg-slate-100 ring-1 ring-slate-200 transition group-hover:ring-4 group-hover:ring-primary dark:bg-slate-800 dark:ring-slate-700 dark:group-hover:ring-blue-300">
+                    <span aria-hidden="true" class="text-3xl font-semibold text-slate-500 dark:text-slate-300">
+                      {initials(name)}
+                    </span>
+                  </div>
+                )}
+                <h3 class="mt-5 text-lg font-bold text-heading transition-colors group-hover:text-primary dark:group-hover:text-blue-300">
+                  {name}
+                </h3>
+                <p class="mt-1 text-sm text-muted">{affiliation}</p>
+                <p class="mt-2 leading-relaxed">{talkTitle ?? topic}</p>
+                {talk && (
+                  <p class="mt-3 text-sm font-medium text-primary dark:text-blue-300">
+                    {`Invited talk ${talk.number} · ${talk.time} `}
+                    <span aria-hidden="true" class="inline-block transition-transform group-hover:translate-x-0.5">
+                      →
+                    </span>
+                  </p>
+                )}
+              </a>
+            </li>
+          );
+        })
       }
     </ul>
     <p class="mt-16 text-muted">

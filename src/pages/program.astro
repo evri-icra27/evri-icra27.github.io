@@ -3,131 +3,16 @@ import Layout from '~/layouts/PageLayout.astro';
 import PageIntro from '~/components/workshop/PageIntro.astro';
 import { Icon } from 'astro-icon/components';
 import Image from '~/components/common/Image.astro';
-import { challenges, getSpeaker, initials, type Speaker } from '~/data/workshop';
+import { SITE } from 'astrowind:config';
+import { challenges, initials, workshop, type Speaker } from '~/data/workshop';
+import { blocks, calendarEvents, sessionRange, slotId, splitTime, toMinutes, wholeDayEvent } from '~/data/program';
 import { getPermalink } from '~/utils/permalinks';
 
-type Item =
-  | { time: string; kind: 'talk'; number: number; speaker: Speaker }
-  | { time: string; kind: 'event'; title: string; short: string; description?: string };
-
-type Block =
-  | { kind: 'session'; label: string; title: string; description: string; items: Item[] }
-  | { kind: 'break'; time: string; title: string; short: string; description?: string };
-
-// Tentative schedule from the final proposal (Sec. 3).
-const blocks: Block[] = [
-  {
-    kind: 'session',
-    label: 'Morning · Session 1',
-    title: 'Sensing and state estimation',
-    description: 'From the event camera itself to agile, low-latency state estimation.',
-    items: [
-      {
-        time: '08:30–08:40',
-        kind: 'event',
-        title: 'Opening remarks',
-        short: 'Opening',
-        description: 'Welcome, workshop goals, and an overview of the day and the challenges.',
-      },
-      {
-        time: '08:40–09:10',
-        kind: 'event',
-        title: 'Tutorial: Event cameras for roboticists',
-        short: 'Tutorial',
-        description:
-          'A short introduction to how event cameras work, common event representations, and where they help robots. Aimed at attendees with conventional perception or robot-learning backgrounds.',
-      },
-      { time: '09:10–09:40', kind: 'talk', number: 1, speaker: getSpeaker('hyunsurk-ryu') },
-      { time: '09:40–10:10', kind: 'talk', number: 2, speaker: getSpeaker('daniel-gehrig') },
-      {
-        time: '10:10–10:30',
-        kind: 'event',
-        title: 'Spotlight talks',
-        short: 'Spotlight talks',
-        description: 'Short presentations of the highest-rated contributed papers.',
-      },
-    ],
-  },
-  {
-    kind: 'break',
-    time: '10:30–11:00',
-    title: 'Coffee and posters 1',
-    short: 'Coffee & posters 1',
-    description: 'First poster session for accepted papers.',
-  },
-  {
-    kind: 'session',
-    label: 'Morning · Session 2',
-    title: 'Benchmarks, geometry, and driving',
-    description: 'The benchmark challenges, then geometric and driving perception with events.',
-    items: [
-      {
-        time: '11:00–11:30',
-        kind: 'event',
-        title: 'Challenge introduction',
-        short: 'Challenge intro',
-        description:
-          'The three benchmark challenges (EvSLAM, eAP TTC, and eAP 3D Detection): tasks, datasets, metrics, and baselines.',
-      },
-      { time: '11:30–12:00', kind: 'talk', number: 3, speaker: getSpeaker('guillermo-gallego') },
-      { time: '12:00–12:30', kind: 'talk', number: 4, speaker: getSpeaker('hoonhee-cho') },
-    ],
-  },
-  { kind: 'break', time: '12:30–14:00', title: 'Lunch', short: 'Lunch' },
-  {
-    kind: 'session',
-    label: 'Afternoon · Session 3',
-    title: 'Human motion and neuromorphic robots',
-    description: 'Semantic perception of people in motion, through to embodied neuromorphic systems.',
-    items: [
-      { time: '14:00–14:30', kind: 'talk', number: 5, speaker: getSpeaker('gaurvi-goyal') },
-      { time: '14:30–15:00', kind: 'talk', number: 6, speaker: getSpeaker('chiara-bartolozzi') },
-      { time: '15:00–15:30', kind: 'talk', number: 7, speaker: getSpeaker('alper-yegenoglu') },
-    ],
-  },
-  {
-    kind: 'break',
-    time: '15:30–16:30',
-    title: 'Coffee, posters, and robot demos 2',
-    short: 'Coffee, posters & demos 2',
-    description: 'Second poster session, with live and video robot and system demos.',
-  },
-  {
-    kind: 'session',
-    label: 'Afternoon · Session 4',
-    title: 'Challenges and discussion',
-    description: 'Challenge results, a panel with all invited speakers, and awards.',
-    items: [
-      {
-        time: '16:30–17:00',
-        kind: 'event',
-        title: 'Challenge results and winners’ talks',
-        short: 'Challenge results',
-        description: 'Final leaderboards for all three challenges, with presentations from the top teams.',
-      },
-      {
-        time: '17:00–17:50',
-        kind: 'event',
-        title: 'Panel discussion',
-        short: 'Panel discussion',
-        description: 'All seven invited speakers, with questions from the audience collected live and in advance.',
-      },
-      { time: '17:50–18:00', kind: 'event', title: 'Closing remarks and awards', short: 'Closing & awards' },
-    ],
-  },
-];
-
-// Calendar overview: two equal four-hour halves either side of lunch.
-const toMinutes = (t: string) => {
-  const [h, m] = t.split(':').map(Number);
-  return h * 60 + m;
-};
+const surname = (s: Speaker) => `${s.name[0]}. ${s.name.split(' ').at(-1)}`;
 const span = (time: string) => {
-  const [start, end] = time.split('–');
+  const { start, end } = splitTime(time);
   return { start: toMinutes(start), end: toMinutes(end) };
 };
-const surname = (s: Speaker) => `${s.name[0]}. ${s.name.split(' ').at(-1)}`;
-const slotId = (time: string) => `slot-${time.slice(0, 5).replace(':', '')}`;
 
 type Category = 'talk' | 'event' | 'break';
 const calendarEntries = blocks.flatMap((block) =>
@@ -177,7 +62,15 @@ const legend: { category: Category; label: string }[] = [
   { category: 'break', label: 'Break, posters & demos' },
 ];
 
-const sessionRange = (items: Item[]) => `${items[0].time.split('–')[0]}–${items.at(-1)!.time.split('–')[1]}`;
+// Calendar export is only offered once the workshop date is confirmed.
+const programUrl = new URL(getPermalink('/program'), SITE.site).href;
+const calendarData = workshop.date && {
+  date: workshop.date,
+  utcOffsetHours: workshop.utcOffsetHours,
+  uidDomain: new URL(SITE.site ?? 'https://evri-icra27.github.io').hostname,
+  events: calendarEvents(programUrl),
+  wholeDay: wholeDayEvent(programUrl),
+};
 
 const panelQuestions = [
   'What should an event foundation model for robotics look like?',
@@ -199,8 +92,44 @@ const linkClass = 'text-primary underline underline-offset-4 dark:text-blue-300'
     <section aria-labelledby="overview-title">
       <h2 id="overview-title" class="mb-2 text-2xl font-bold text-heading">The day at a glance</h2>
       <p class="mb-4 text-sm text-muted">
-        Times and talk titles are provisional. Date and room to be announced. All times are local (Seoul, KST).
+        {
+          `Times and talk titles are provisional. ${workshop.date ? 'Room' : 'Date and room'} to be announced. All times are local (Seoul, KST).`
+        }
       </p>
+      {
+        calendarData && (
+          <div
+            data-calendar-export
+            class="mb-6 flex flex-col gap-3 rounded-xl border border-slate-200 p-4 sm:flex-row sm:items-center sm:justify-between dark:border-slate-700"
+          >
+            <div class="flex items-start gap-3">
+              <Icon name="tabler:calendar-plus" class="mt-0.5 h-5 w-5 shrink-0 text-primary dark:text-blue-300" />
+              <p class="text-sm leading-relaxed text-muted">
+                <span class="font-semibold text-heading">Add to your calendar.</span> Add the whole day, or tick the
+                talks and sessions you want below. Works with Apple, Google, and Outlook calendars.
+              </p>
+            </div>
+            <div class="flex shrink-0 gap-2">
+              <button
+                type="button"
+                data-calendar-download="all"
+                class="cursor-pointer rounded-full bg-primary px-4 py-2 text-sm font-semibold whitespace-nowrap text-white transition-colors hover:bg-secondary"
+              >
+                Whole day
+              </button>
+              <button
+                type="button"
+                data-calendar-download="selected"
+                disabled
+                class="cursor-pointer rounded-full border border-slate-300 px-4 py-2 text-sm font-medium whitespace-nowrap text-heading transition-colors hover:bg-slate-100 disabled:cursor-not-allowed disabled:opacity-50 disabled:hover:bg-transparent dark:border-slate-600 dark:hover:bg-slate-800"
+              >
+                Selected (<span data-calendar-count>0</span>)
+              </button>
+            </div>
+            <script is:inline type="application/json" id="calendar-data" set:html={JSON.stringify(calendarData)} />
+          </div>
+        )
+      }
       <ul class="mb-6 flex flex-wrap gap-x-5 gap-y-2 text-sm text-muted">
         {
           legend.map(({ category, label }) => (
@@ -239,15 +168,29 @@ const linkClass = 'text-primary underline underline-offset-4 dark:text-blue-300'
                     />
                   ))}
                   {half.entries.map((entry) => (
-                    <li class="absolute inset-x-1" style={`top: ${entry.top + 1}px; height: ${entry.height - 2}px`}>
+                    <li
+                      class:list={[
+                        'absolute inset-x-1 flex items-center overflow-hidden rounded-md border-l-4 text-xs leading-tight transition-colors',
+                        categoryStyles[entry.category],
+                      ]}
+                      style={`top: ${entry.top + 1}px; height: ${entry.height - 2}px`}
+                    >
+                      {calendarData && (
+                        <input
+                          type="checkbox"
+                          value={slotId(entry.time)}
+                          data-calendar-select
+                          aria-label={`Select ${entry.label}, ${entry.time}, for your calendar`}
+                          class="ml-2 h-3.5 w-3.5 shrink-0 cursor-pointer accent-primary"
+                        />
+                      )}
                       <a
                         href={`#${slotId(entry.time)}`}
                         class:list={[
-                          'flex h-full overflow-hidden rounded-md border-l-4 px-2 text-xs leading-tight transition-colors',
+                          'flex h-full min-w-0 flex-1 px-2',
                           entry.height >= 48
                             ? 'flex-col justify-center gap-0.5 py-1'
                             : 'items-center justify-between gap-2',
-                          categoryStyles[entry.category],
                         ]}
                       >
                         <span class="truncate font-semibold">{entry.label}</span>
@@ -428,3 +371,55 @@ const linkClass = 'text-primary underline underline-offset-4 dark:text-blue-300'
     </section>
   </div>
 </Layout>
+
+<script>
+  import { buildIcs, type CalendarEvent } from '~/utils/calendar';
+
+  interface CalendarData {
+    date: string;
+    utcOffsetHours: number;
+    uidDomain: string;
+    events: CalendarEvent[];
+    wholeDay: CalendarEvent;
+  }
+
+  const download = (ics: string, filename: string) => {
+    const url = URL.createObjectURL(new Blob([ics], { type: 'text/calendar;charset=utf-8' }));
+    const link = Object.assign(document.createElement('a'), { href: url, download: filename });
+    document.body.append(link);
+    link.click();
+    link.remove();
+    setTimeout(() => URL.revokeObjectURL(url), 1000);
+  };
+
+  // astro:page-load runs on first load and after every <ClientRouter /> navigation.
+  document.addEventListener('astro:page-load', () => {
+    const panel = document.querySelector<HTMLElement>('[data-calendar-export]');
+    const source = document.getElementById('calendar-data');
+    if (!panel || !source) return;
+
+    const data: CalendarData = JSON.parse(source.textContent ?? '{}');
+    const options = { date: data.date, utcOffsetHours: data.utcOffsetHours, uidDomain: data.uidDomain };
+    const boxes = [...document.querySelectorAll<HTMLInputElement>('[data-calendar-select]')];
+    const selectedButton = panel.querySelector<HTMLButtonElement>('[data-calendar-download="selected"]')!;
+    const count = panel.querySelector('[data-calendar-count]')!;
+    const selected = () => boxes.filter((box) => box.checked).map((box) => box.value);
+
+    const update = () => {
+      const n = selected().length;
+      count.textContent = String(n);
+      selectedButton.disabled = n === 0;
+    };
+    boxes.forEach((box) => box.addEventListener('change', update));
+    update();
+
+    panel.querySelector('[data-calendar-download="all"]')!.addEventListener('click', () => {
+      download(buildIcs([data.wholeDay], options), 'evri-icra27.ics');
+    });
+    selectedButton.addEventListener('click', () => {
+      const ids = new Set(selected());
+      const events = data.events.filter((event) => ids.has(event.id));
+      if (events.length) download(buildIcs(events, options), 'evri-icra27-selected.ics');
+    });
+  });
+</script>
